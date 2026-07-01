@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>T-Beam Checker | ตรวจสอบหน้าตัด T-Beam</title>
+<style>
+:root{
+  --blue:#1a56db;--blue-dk:#1648c0;--blue-lt:#eff6ff;
+  --green:#057a55;--green-lt:#d1fae5;
+  --red:#e02424;--red-lt:#fee2e2;
+  --amber:#92400e;--amber-lt:#fef3c7;
+  --gray-50:#f8fafc;--gray-100:#f1f5f9;--gray-200:#e2e8f0;
+  --gray-300:#cbd5e1;--gray-500:#64748b;--gray-700:#334155;--gray-900:#0f172a;
+  --brd:#e2e8f0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',-apple-system,Tahoma,sans-serif;background:var(--gray-100);color:var(--gray-900);font-size:14px;line-height:1.6}
+header{background:linear-gradient(135deg,var(--blue),var(--blue-dk));color:#fff;padding:22px 20px;text-align:center}
+header h1{font-size:21px;font-weight:700;margin-bottom:4px}
+header p{font-size:13px;opacity:.88}
+.container{max-width:1240px;margin:0 auto;padding:20px}
+.grid{display:grid;grid-template-columns:370px 1fr;gap:20px}
+@media(max-width:900px){.grid{grid-template-columns:1fr}}
+.card{background:#fff;border:1px solid var(--brd);border-radius:12px;padding:16px 18px;margin-bottom:16px}
+.card h2{font-size:14px;font-weight:700;color:var(--blue);display:flex;align-items:center;gap:7px;border-bottom:1px solid var(--brd);padding-bottom:9px;margin-bottom:13px}
+.card h3{font-size:12px;font-weight:700;color:var(--gray-700);margin:13px 0 7px;text-transform:uppercase;letter-spacing:.04em}
+.field{margin-bottom:10px}
+.field label{display:block;font-size:11.5px;color:var(--gray-700);margin-bottom:3px;font-weight:600}
+.hint{font-size:10.5px;color:var(--gray-500);font-weight:400;margin-left:3px}
+.fr{display:flex;align-items:center;gap:6px}
+.fr input,.fr select{flex:1;height:32px;padding:0 9px;border:1px solid var(--gray-300);border-radius:6px;font-size:13px;background:#fff;color:var(--gray-900)}
+.fr input:focus,.fr select:focus{outline:none;border-color:var(--blue);box-shadow:0 0 0 3px var(--blue-lt)}
+.unit{font-size:11px;color:var(--gray-500);min-width:44px}
+.divider{border-top:1px solid var(--brd);margin:13px 0 10px;padding-top:10px}
+.toggle-grp{display:flex;gap:6px;margin-bottom:11px}
+.tog{flex:1;padding:7px;text-align:center;border:1px solid var(--gray-300);border-radius:7px;font-size:12px;cursor:pointer;background:#fff;color:var(--gray-700);font-weight:600;transition:.15s}
+.tog.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+button.run{width:100%;height:40px;background:var(--blue);color:#fff;border:none;border-radius:8px;font-size:14px;font-weight:700;cursor:pointer;margin-top:6px;letter-spacing:.02em}
+button.run:hover{background:var(--blue-dk)}
+.banner{padding:14px 18px;border-radius:10px;margin-bottom:14px;display:flex;align-items:center;gap:14px}
+.banner.pass{background:var(--green-lt);border:1px solid #6ee7b7}
+.banner.fail{background:var(--red-lt);border:1px solid #fca5a5}
+.banner.info{background:var(--blue-lt);border:1px solid #93c5fd}
+.banner .ico{font-size:28px;flex-shrink:0}
+.banner strong{font-size:15px;display:block;color:var(--gray-900)}
+.banner span{font-size:12px;color:var(--gray-700)}
+.chk{border:1px solid var(--brd);border-radius:8px;padding:11px 13px;margin-bottom:9px}
+.chk.ok{border-left:4px solid var(--green)}
+.chk.bad{border-left:4px solid var(--red)}
+.chk.info{border-left:4px solid var(--blue)}
+.chk.warn{border-left:4px solid #f59e0b}
+.ch{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:4px;gap:8px}
+.ch .nm{font-weight:700;font-size:13px;line-height:1.3}
+.bdg{font-size:10.5px;font-weight:700;padding:2px 10px;border-radius:12px;white-space:nowrap;flex-shrink:0}
+.bdg.pass{background:var(--green-lt);color:var(--green)}
+.bdg.fail{background:var(--red-lt);color:var(--red)}
+.bdg.gov{background:var(--blue-lt);color:var(--blue)}
+.bdg.warn{background:var(--amber-lt);color:var(--amber)}
+.formula{font-family:'Courier New',monospace;font-size:12px;background:var(--gray-50);border-radius:6px;padding:6px 10px;margin:5px 0;color:var(--gray-900);line-height:1.6}
+.note{font-size:12px;color:var(--gray-700);margin-top:5px;line-height:1.5}
+.ref{font-size:11px;color:var(--gray-500);margin-top:5px;font-style:italic}
+.svg-wrap{display:flex;justify-content:center;background:var(--gray-50);border-radius:8px;padding:10px;margin-bottom:12px}
+.vtab{width:100%;border-collapse:collapse;font-size:12px;margin-top:4px}
+.vtab th{background:var(--gray-50);text-align:left;padding:7px 9px;font-weight:700;color:var(--gray-700);border-bottom:2px solid var(--brd)}
+.vtab td{padding:6px 9px;border-bottom:1px solid var(--brd);vertical-align:top;line-height:1.5}
+.vtab tr:last-child td{border-bottom:none}
+.vsym{font-family:'Courier New',monospace;font-weight:700;color:var(--blue);white-space:nowrap}
+.rlist{font-size:12px;color:var(--gray-700)}
+.rlist li{margin-bottom:9px;padding-left:3px;list-style:none}
+.rlist .rt{font-weight:700;color:var(--gray-900)}
+.rlist .rd{color:var(--gray-500);font-size:11px}
+.notebox{background:var(--amber-lt);border:1px solid #fde68a;border-radius:8px;padding:10px 13px;font-size:12px;color:var(--amber);margin-top:10px;line-height:1.5}
+.summary-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:12px}
+.scard{background:var(--gray-50);border:1px solid var(--brd);border-radius:8px;padding:10px 13px;text-align:center}
+.scard .sl{font-size:11px;color:var(--gray-500);margin-bottom:2px}
+.scard .sv{font-size:18px;font-weight:700;color:var(--gray-900)}
+.scard .su{font-size:11px;color:var(--gray-500)}
+.scard.hi .sv{color:var(--blue)}
+.scard.gn .sv{color:var(--green)}
+footer{text-align:center;padding:24px;font-size:11px;color:var(--gray-500)}
+.print-only{display:none}
+.toolbar{display:flex;justify-content:flex-end;margin-bottom:12px;gap:8px}
+.btn-export{background:var(--blue);color:#fff;border:none;border-radius:8px;padding:10px 18px;font-weight:700;font-size:13px;cursor:pointer;display:flex;align-items:center;gap:7px}
+.btn-export:hover{background:var(--blue-dk)}
+.link-btn{background:none;border:none;color:var(--blue);font-size:11px;font-weight:700;cursor:pointer;padding:2px 0;text-decoration:underline}
+@media print{
+  .no-print{display:none !important}
+  .print-only{display:block !important}
+  body{background:#fff;font-size:11.5px}
+  header{background:#fff !important;color:#000 !important;border:2px solid #0f172a;border-radius:0}
+  header p{color:#333}
+  .container{max-width:100% !important;padding:6px}
+  .grid{display:block !important}
+  .card{page-break-inside:avoid;box-shadow:none;border:1px solid #cbd5e1;margin-bottom:10px}
+  .chk{page-break-inside:avoid}
+  input,select{border:none !important;background:transparent !important;box-shadow:none !important;padding:0 2px !important;color:#000 !important;-webkit-appearance:none;appearance:none}
+  .fr .unit{color:#000}
+  footer{display:none}
+  #print-header{border-bottom:2px solid #0f172a;margin-bottom:14px;padding-bottom:10px}
+  #print-header h1{font-size:17px;margin-bottom:8px}
+  .print-meta{width:100%;border-collapse:collapse;font-size:11px}
+  .print-meta td{padding:2px 6px}
+  .print-meta td:first-child,.print-meta td:nth-child(3){font-weight:700;color:#334155;width:90px}
+}
+</style>
+</head>
+<body>
+
+<header>
+  <h1>🏗 T-Beam Effective Flange Width &amp; Load Capacity Checker</h1>
+  <p>ตรวจสอบความกว้างปีกประสิทธิผล · ข้อบังคับ ACI 318-19 · กำลังรับน้ำหนักบรรทุก (ตัน/ม.) · มาตรฐาน EIT / DPT (มยผ.)</p>
+</header>
+
+<div class="container">
+
+<div class="toolbar no-print">
+  <button class="btn-export" onclick="window.print()">🖨️ Export รายการคำนวณ (PDF)</button>
+</div>
+
+<div id="print-header" class="print-only">
+  <h1>รายการคำนวณตรวจสอบหน้าตัดคาน T-Beam (T-Beam Design Check Calculation)</h1>
+  <table class="print-meta">
+    <tr><td>โครงการ:</td><td id="ph-proj">—</td><td>วันที่:</td><td id="ph-date">—</td></tr>
+    <tr><td>หมายเลขคาน:</td><td id="ph-mark">—</td><td>ผู้ตรวจสอบ:</td><td id="ph-eng">—</td></tr>
+  </table>
+</div>
+
+<div class="grid">
+
+<!-- ===== LEFT INPUT PANEL ===== -->
+<div>
+<div class="card">
+  <h2>🗂️ ข้อมูลรายการคำนวณ <span class="hint">(ใช้กับ Export PDF)</span></h2>
+  <div class="field">
+    <label>ชื่อโครงการ</label>
+    <div class="fr"><input type="text" id="projName" placeholder="เช่น อาคารพักอาศัย 3 ชั้น"></div>
+  </div>
+  <div class="field">
+    <label>หมายเลข / ตำแหน่งคาน (Beam Mark)</label>
+    <div class="fr"><input type="text" id="beamMark" placeholder="เช่น B-12"></div>
+  </div>
+  <div class="field">
+    <label>ผู้ตรวจสอบ</label>
+    <div class="fr"><input type="text" id="engName" placeholder="ชื่อวิศวกรผู้ตรวจสอบ"></div>
+  </div>
+</div>
+<div class="card">
+  <h2>📥 ข้อมูลนำเข้า</h2>
+
+  <div class="toggle-grp">
+    <div class="tog on" id="tg-int" onclick="setType('interior')">คานกลาง (Interior)</div>
+    <div class="tog"    id="tg-edg" onclick="setType('edge')">คานริม (Edge/Spandrel)</div>
+  </div>
+
+  <div class="divider"></div>
+  <h3>ผังพื้น &amp; ช่วงคาน</h3>
+  <div class="field">
+    <label>ความยาวช่วงคาน L <span class="hint">(c/c supports)</span></label>
+    <div class="fr"><input type="number" id="L" value="900" min="100" step="10"><span class="unit">cm</span></div>
+  </div>
+  <div class="field">
+    <label id="lbl-s">ระยะห่างคานข้างเคียง s (c/c) <span class="hint">สมมาตรทั้งสองข้าง</span></label>
+    <div class="fr"><input type="number" id="s" value="600" min="10" step="10"><span class="unit">cm</span></div>
+  </div>
+  <div class="field" id="edge-field" style="display:none">
+    <label>ระยะถึงขอบพื้นด้านที่ไม่มีคาน s_e <span class="hint">clear distance</span></label>
+    <div class="fr"><input type="number" id="s_e" value="300" min="10" step="10"><span class="unit">cm</span></div>
+  </div>
+
+  <div class="divider"></div>
+  <h3>ขนาดหน้าตัดคาน</h3>
+  <div class="field">
+    <label>ความกว้างคอคาน bw</label>
+    <div class="fr"><input type="number" id="bw" value="30" min="10" step="1"><span class="unit">cm</span></div>
+  </div>
+  <div class="field">
+    <label>ความลึกรวม h</label>
+    <div class="fr"><input type="number" id="h" value="60" min="20" step="1"><span class="unit">cm</span></div>
+  </div>
+  <div class="field">
+    <label>ความลึกประสิทธิผล d</label>
+    <div class="fr"><input type="number" id="d" value="53" min="10" step="1"><span class="unit">cm</span></div>
+  </div>
+  <div class="field">
+    <label>ความหนาแผ่นพื้น hf</label>
+    <div class="fr"><input type="number" id="hf" value="12" min="4" step="0.5"><span class="unit">cm</span></div>
+  </div>
+
+  <div class="divider"></div>
+  <h3>วัสดุ</h3>
+  <div class="field">
+    <label>กำลังอัดคอนกรีต f'c</label>
+    <div class="fr">
+      <select id="fc">
+        <option value="180">180 ksc (C180)</option>
+        <option value="210">210 ksc (C210)</option>
+        <option value="240" selected>240 ksc (C240)</option>
+        <option value="280">280 ksc (C280)</option>
+        <option value="320">320 ksc (C320)</option>
+        <option value="350">350 ksc (C350)</option>
+        <option value="400">400 ksc (C400)</option>
+      </select>
+    </div>
+  </div>
+  <div class="field">
+    <label>กำลังครากเหล็กหลัก fy</label>
+    <div class="fr">
+      <select id="fy">
+        <option value="2400">SR24 — 2,400 ksc</option>
+        <option value="3000">SR30 — 3,000 ksc</option>
+        <option value="3900">SD40 — 3,900 ksc</option>
+        <option value="4000" selected>SD40E — 4,000 ksc</option>
+        <option value="5000">SD50 — 5,000 ksc</option>
+      </select>
+    </div>
+  </div>
+  <div class="field">
+    <label>กำลังครากเหล็กปลอก fyt</label>
+    <div class="fr">
+      <select id="fyt">
+        <option value="2400">SR24 — 2,400 ksc</option>
+        <option value="3000" selected>SR30 — 3,000 ksc</option>
+        <option value="3900">SD40 — 3,900 ksc</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="divider"></div>
+  <h3>รูปแบบการออกแบบหน้าตัด</h3>
+  <div class="toggle-grp">
+    <div class="tog on" id="tg-sng" onclick="setRtype('singly')">Singly Reinforced</div>
+    <div class="tog"    id="tg-dbl" onclick="setRtype('doubly')">Doubly Reinforced</div>
+  </div>
+
+  <div class="divider"></div>
+  <h3>เหล็กเสริมที่ใช้จริง</h3>
+  <div class="field">
+    <label>As ที่จัดวางจริง — เหล็กรับแรงดึงล่าง (Bottom / Tension)</label>
+    <div class="fr"><input type="number" id="As" value="11.40" min="0.1" step="0.1"><span class="unit">cm²</span></div>
+  </div>
+  <div class="field" id="fld-Asp" style="display:none">
+    <label>As′ ที่จัดวางจริง — เหล็กรับแรงอัดบน (Top / Compression) <span class="hint">สำหรับ Doubly</span></label>
+    <div class="fr"><input type="number" id="Asp" value="4.00" min="0" step="0.1"><span class="unit">cm²</span></div>
+  </div>
+  <div class="field" id="fld-dp" style="display:none">
+    <label>d′ ระยะจากผิวรับแรงอัดถึงศูนย์กลาง As′</label>
+    <div class="fr"><input type="number" id="dp" value="5" min="2" step="0.5"><span class="unit">cm</span></div>
+  </div>
+  <div class="field">
+    <label>เส้นผ่าศูนย์กลางเหล็กปลอก Øst</label>
+    <div class="fr">
+      <select id="stirDia">
+        <option value="0.6">RB6 — 0.6 cm</option>
+        <option value="0.9" selected>RB9 — 0.9 cm</option>
+        <option value="1.2">RB12 — 1.2 cm</option>
+        <option value="1.6">DB16 — 1.6 cm</option>
+      </select>
+    </div>
+  </div>
+  <div class="field">
+    <label>จำนวนขาเหล็กปลอก</label>
+    <div class="fr">
+      <select id="stirLegs">
+        <option value="2" selected>2 ขา</option>
+        <option value="3">3 ขา</option>
+        <option value="4">4 ขา</option>
+      </select>
+    </div>
+  </div>
+  <div class="field">
+    <label>ระยะห่างเหล็กปลอก s_v</label>
+    <div class="fr"><input type="number" id="sv" value="15" min="5" max="60" step="1"><span class="unit">cm</span></div>
+  </div>
+  <div class="field">
+    <label>คอนกรีตหุ้ม (clear cover)</label>
+    <div class="fr"><input type="number" id="cover" value="4" min="2" step="0.5"><span class="unit">cm</span></div>
+  </div>
+
+  <div class="divider"></div>
+  <h3>เหล็กเสริมตามขวางบริเวณปีกคาน <span class="hint">(Flange Transverse Steel)</span></h3>
+  <div class="field">
+    <label>เส้นผ่าศูนย์กลางเหล็กปีกตามขวาง</label>
+    <div class="fr">
+      <select id="flDia">
+        <option value="0.6" selected>RB6 — 0.6 cm</option>
+        <option value="0.9">RB9 — 0.9 cm</option>
+        <option value="1.2">DB12 — 1.2 cm</option>
+      </select>
+    </div>
+  </div>
+  <div class="field">
+    <label>ระยะห่างเหล็กปีกตามขวาง s_f</label>
+    <div class="fr"><input type="number" id="flSpacing" value="20" min="5" step="1"><span class="unit">cm</span></div>
+  </div>
+
+  <div class="divider"></div>
+  <h3>ตรวจสอบน้ำหนักบรรทุกใช้งานจริง <span class="hint">(Applied Load Check)</span></h3>
+  <div class="toggle-grp">
+    <div class="tog on" id="tg-wfac" onclick="setLoadMode('factored')">Wu ประลัยโดยตรง</div>
+    <div class="tog"    id="tg-wsvc" onclick="setLoadMode('service')">DL + LL (Service)</div>
+  </div>
+  <div class="field" id="fld-Wu">
+    <label>Wu — น้ำหนักบรรทุกประลัยที่ใช้งานจริง</label>
+    <div class="fr"><input type="number" id="WuInput" value="0" min="0" step="0.01"><span class="unit">ตัน/ม.</span></div>
+    <button type="button" class="link-btn" onclick="fillCapacity()">ใช้ค่ากำลังสูงสุดที่คานรับได้ล่าสุด (Wu,allow)</button>
+  </div>
+  <div class="field" id="fld-DL" style="display:none">
+    <label>DL — น้ำหนักบรรทุกคงที่ (Dead Load, ใช้งาน)</label>
+    <div class="fr"><input type="number" id="DL" value="0" min="0" step="0.01"><span class="unit">ตัน/ม.</span></div>
+  </div>
+  <div class="field" id="fld-LL" style="display:none">
+    <label>LL — น้ำหนักบรรทุกจร (Live Load, ใช้งาน)</label>
+    <div class="fr"><input type="number" id="LL" value="0" min="0" step="0.01"><span class="unit">ตัน/ม.</span></div>
+    <div class="note" style="margin-top:4px">Wu = 1.2×DL + 1.6×LL <span style="color:var(--gray-500)">(ACI 318-19 ข้อ 5.3.1)</span></div>
+  </div>
+
+  <button class="run" onclick="run()">▶ ตรวจสอบและคำนวณกำลังรับน้ำหนัก</button>
+</div>
+</div>
+
+<!-- ===== RIGHT RESULT PANEL ===== -->
+<div>
+  <div id="banner-area"></div>
+
+  <div class="card">
+    <h2>🏋️ ผลตรวจสอบน้ำหนักบรรทุกที่ระบุ (Applied Load Check)</h2>
+    <div id="applied-load-result"></div>
+  </div>
+
+  <!-- Summary cards -->
+  <div class="summary-grid" id="sum-grid" style="display:none">
+    <div class="scard hi"><div class="sl">bf (effective)</div><div class="sv" id="s-bf">—</div><div class="su">cm</div></div>
+    <div class="scard hi"><div class="sl">φMn</div><div class="sv" id="s-mn">—</div><div class="su">kgf·m</div></div>
+    <div class="scard hi"><div class="sl">φVn</div><div class="sv" id="s-vn">—</div><div class="su">kgf</div></div>
+    <div class="scard gn"><div class="sl">Wu (จากโมเมนต์)</div><div class="sv" id="s-wm">—</div><div class="su">ตัน/ม.</div></div>
+    <div class="scard gn"><div class="sl">Wu (จากแรงเฉือน)</div><div class="sv" id="s-wv">—</div><div class="su">ตัน/ม.</div></div>
+    <div class="scard gn" style="background:#d1fae5;border-color:#6ee7b7"><div class="sl">⚖️ Wu,allow (governs)</div><div class="sv" id="s-wg" style="color:var(--green)">—</div><div class="su">ตัน/ม.</div></div>
+  </div>
+
+  <div class="card">
+    <h2>📐 หน้าตัด T-Beam (SVG)</h2>
+    <div class="svg-wrap" id="svg-area"><p style="color:var(--gray-500);padding:20px">กดคำนวณเพื่อแสดงภาพ</p></div>
+  </div>
+
+  <div class="card">
+    <h2>📏 ผลตรวจสอบ Effective Flange Width</h2>
+    <div id="flange-result"></div>
+  </div>
+
+  <div class="card">
+    <h2>📋 ข้อบังคับ ACI 318-19 สำหรับ T-Beam</h2>
+    <div id="code-checks"></div>
+  </div>
+
+  <div class="card">
+    <h2>⚖️ กำลังรับน้ำหนักบรรทุก (Load Capacity)</h2>
+    <div id="load-result"></div>
+  </div>
+
+  <div class="card">
+    <h2>📈 แผนภาพแรงเฉือน &amp; โมเมนต์ดัดตลอดความยาวคาน (SFD / BMD)</h2>
+    <div id="diagram-result"></div>
+  </div>
+
+  <div class="card">
+    <h2>📖 คำอธิบายตัวแปร</h2>
+    <table class="vtab">
+      <thead><tr><th>สัญลักษณ์</th><th>ความหมาย</th><th>หน่วย</th></tr></thead>
+      <tbody>
+        <tr><td class="vsym">L</td><td>ความยาวช่วงคาน วัด c/c จุดรองรับ</td><td>cm</td></tr>
+        <tr><td class="vsym">s</td><td>ระยะห่างระหว่างคาน (c/c) ทั้งสองข้าง — กำหนดความกว้าง tributary ของปีก</td><td>cm</td></tr>
+        <tr><td class="vsym">bw</td><td>ความกว้างคอคาน (web width) ส่วนที่อยู่ใต้พื้น</td><td>cm</td></tr>
+        <tr><td class="vsym">h</td><td>ความลึกรวมคาน (overall depth) จากผิวบนถึงผิวล่าง</td><td>cm</td></tr>
+        <tr><td class="vsym">d</td><td>ความลึกประสิทธิผล (effective depth) จากผิวรับแรงอัดถึงศูนย์กลางเหล็กรับแรงดึง</td><td>cm</td></tr>
+        <tr><td class="vsym">hf</td><td>ความหนาแผ่นพื้น/ปีก (flange thickness) ที่หล่อร่วมกับคานเป็นเนื้อเดียว</td><td>cm</td></tr>
+        <tr><td class="vsym">bf</td><td>ความกว้างปีกประสิทธิผล (effective flange width) ค่าต่ำสุดจากเงื่อนไขทั้งหมด</td><td>cm</td></tr>
+        <tr><td class="vsym">f'c</td><td>กำลังอัดประลัยคอนกรีต (ทรงกระบอก 15×30 ซม.) อายุ 28 วัน</td><td>ksc</td></tr>
+        <tr><td class="vsym">fy</td><td>กำลังครากเหล็กเสริมหลักรับแรงดึง</td><td>ksc</td></tr>
+        <tr><td class="vsym">fyt</td><td>กำลังครากเหล็กปลอก (transverse reinforcement)</td><td>ksc</td></tr>
+        <tr><td class="vsym">As</td><td>พื้นที่หน้าตัดเหล็กรับแรงดึงที่จัดวางจริง</td><td>cm²</td></tr>
+        <tr><td class="vsym">β₁</td><td>ปัจจัยรูปทรงบล็อกความเค้นอัดเทียบเท่า (Whitney stress block factor)</td><td>—</td></tr>
+        <tr><td class="vsym">a</td><td>ความลึกบล็อกความเค้นอัดเทียบเท่า = β₁·c</td><td>cm</td></tr>
+        <tr><td class="vsym">c</td><td>ความลึกแกนสะเทิน (neutral axis depth) จากผิวรับแรงอัด</td><td>cm</td></tr>
+        <tr><td class="vsym">ε_t</td><td>ความเครียดดึงสุทธิของเหล็กที่อยู่ไกลสุดจากแกนสะเทิน</td><td>—</td></tr>
+        <tr><td class="vsym">φ</td><td>ตัวคูณลดกำลัง: φ=0.90 (ดัด, tension-controlled), φ=0.75 (เฉือน)</td><td>—</td></tr>
+        <tr><td class="vsym">Mn</td><td>กำลังรับโมเมนต์ระบุ (nominal moment strength)</td><td>kgf·m</td></tr>
+        <tr><td class="vsym">φMn</td><td>กำลังรับโมเมนต์ออกแบบ (design moment strength)</td><td>kgf·m</td></tr>
+        <tr><td class="vsym">Vc</td><td>กำลังรับแรงเฉือนของคอนกรีตล้วน (concrete shear strength)</td><td>kgf</td></tr>
+        <tr><td class="vsym">Vs</td><td>กำลังรับแรงเฉือนของเหล็กปลอก (stirrup shear contribution)</td><td>kgf</td></tr>
+        <tr><td class="vsym">φVn</td><td>กำลังรับแรงเฉือนออกแบบ = φ(Vc+Vs)</td><td>kgf</td></tr>
+        <tr><td class="vsym">Wu</td><td>น้ำหนักบรรทุกแผ่กระจายแบบประลัย (factored distributed load) สูงสุดที่คานรับได้</td><td>kgf/m → ตัน/ม.</td></tr>
+        <tr><td class="vsym">Ws</td><td>น้ำหนักใช้งานประมาณ (service load) ≈ Wu/1.5 — ค่าโดยประมาณ ขึ้นกับสัดส่วน DL:LL จริง</td><td>ตัน/ม.</td></tr>
+        <tr><td class="vsym">As′</td><td>พื้นที่เหล็กเสริมรับแรงอัด (compression steel) ที่ด้านบนคาน — ใช้เมื่อออกแบบแบบ Doubly Reinforced</td><td>cm²</td></tr>
+        <tr><td class="vsym">d′</td><td>ระยะจากผิวรับแรงอัดถึงศูนย์กลางเหล็ก As′</td><td>cm</td></tr>
+        <tr><td class="vsym">fs′</td><td>หน่วยแรงในเหล็กรับแรงอัด ณ สภาวะประลัย (อาจครากหรือไม่ครากขึ้นกับ c เทียบกับ d′)</td><td>ksc</td></tr>
+        <tr><td class="vsym">Es</td><td>โมดูลัสยืดหยุ่นของเหล็กเสริม (สมมติ = 2,000,000 ksc)</td><td>ksc</td></tr>
+        <tr><td class="vsym">As,f</td><td>เหล็กเสริมตามขวางบริเวณปีกคาน (flange transverse reinforcement) ต่อความกว้าง 1 เมตร</td><td>cm²/m</td></tr>
+        <tr><td class="vsym">s_f</td><td>ระยะห่างเหล็กปีกตามขวางที่จัดวางจริง</td><td>cm</td></tr>
+        <tr><td class="vsym">Wu (applied)</td><td>น้ำหนักบรรทุกประลัยที่ระบุเพื่อตรวจสอบ — กรอกโดยตรง หรือคำนวณจาก 1.2DL+1.6LL</td><td>ตัน/ม.</td></tr>
+        <tr><td class="vsym">DL, LL</td><td>น้ำหนักบรรทุกคงที่ (Dead Load) และน้ำหนักบรรทุกจร (Live Load) แบบใช้งาน (Service, ยังไม่คูณตัวประกอบ)</td><td>ตัน/ม.</td></tr>
+        <tr><td class="vsym">DCR</td><td>Demand/Capacity Ratio = แรงกระทำจริง ÷ กำลังรับที่ออกแบบได้ — ต้อง ≤ 1.0</td><td>—</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="card">
+    <h2>📚 แหล่งอ้างอิง</h2>
+    <ul class="rlist">
+      <li><div class="rt">ACI 318-19 ข้อ 6.3.2 — T-Beam Geometry</div>
+        <div class="rd">กำหนดเงื่อนไข effective flange width สำหรับคานกลาง (6.3.2.1) และคานริม (6.3.2.2) ครอบคลุม 3 เงื่อนไขต่อกรณี</div></li>
+      <li><div class="rt">ACI 318-19 ข้อ 9.6.1.2 — Minimum Flexural Reinforcement</div>
+        <div class="rd">As,min = max[0.25√f'c/fy · bw·d , 14/fy · bw·d] (หน่วย ksc/cm²) — ใช้ bw ไม่ใช่ bf เพราะควบคุมด้วยคอคาน</div></li>
+      <li><div class="rt">ACI 318-19 ตาราง 21.2.2 — Strength Reduction Factors (φ)</div>
+        <div class="rd">φ=0.90 สำหรับ tension-controlled (ε_t ≥ 0.005), φ=0.75 สำหรับแรงเฉือน</div></li>
+      <li><div class="rt">ACI 318-19 ตาราง 22.2.2.4.3 — β₁ Values</div>
+        <div class="rd">β₁=0.85 เมื่อ f'c≤280 ksc, ลดลง 0.05 ต่อทุก 70 ksc ที่เพิ่มขึ้น แต่ไม่น้อยกว่า 0.65</div></li>
+      <li><div class="rt">ACI 318-19 ข้อ 22.5.5.1 — Concrete Shear Strength (Vc)</div>
+        <div class="rd">Vc = 0.53√f'c · bw · d (ksc, cm) สำหรับหน้าตัดที่ไม่มีแรงอัดในแนวแกน — ใช้ bw เป็นฐาน</div></li>
+      <li><div class="rt">ACI 318-19 ข้อ 9.7.6.2.2 — Stirrup Spacing Limits</div>
+        <div class="rd">s_max = min(d/2, 60 cm) เมื่อ Vs ≤ 0.33√f'c·bw·d และ s_max = min(d/4, 30 cm) เมื่อ Vs เกินกว่านั้น</div></li>
+      <li><div class="rt">มยผ. 1103-61 (DPT) — มาตรฐานการออกแบบคอนกรีตเสริมเหล็กด้วยวิธีกำลัง</div>
+        <div class="rd">กรมโยธาธิการและผังเมือง อ้างอิง ACI 318 ปรับหน่วยเป็น ksc/cm สำหรับงานในประเทศไทย</div></li>
+      <li><div class="rt">วสท. 1008-38 (EIT) — มาตรฐานการออกแบบอาคารคอนกรีตเสริมเหล็ก</div>
+        <div class="rd">วิศวกรรมสถานแห่งประเทศไทยฯ ใช้คู่ขนานกับ ACI 318 เป็นมาตรฐานอ้างอิงหลักในการขอใบอนุญาตก่อสร้าง</div></li>
+      <li><div class="rt">ACI 318-19 ข้อ 22.3 — Doubly Reinforced Flexural Strength</div>
+        <div class="rd">คำนวณ Mn โดยรวมแรงอัดจากเหล็ก As′ เข้ากับแรงอัดคอนกรีต ตรวจสอบว่า fs′ ครากหรือไม่ครากจากตำแหน่งแกนสะเทิน c เทียบกับ d′</div></li>
+      <li><div class="rt">ACI 318-19 ข้อ 7.5.2.3 — Flange Transverse Reinforcement</div>
+        <div class="rd">แนวคิดเดียวกับข้อ 8.10.5.2 ในฉบับก่อน: เหล็กปีกตามขวางถ่ายแรงจากปีกยื่นเข้าคอคาน ระยะห่างไม่เกิน min(5hf, 45cm) และปริมาณไม่น้อยกว่าเหล็กหดตัว-อุณหภูมิ</div></li>
+      <li><div class="rt">สมมติฐานคานช่วงเดียว (Simply Supported, UDL)</div>
+        <div class="rd">แผนภาพ SFD/BMD สร้างจาก V(x)=Wu(L/2−x), M(x)=Wu·x(L−x)/2 — หากโครงสร้างจริงเป็นคานต่อเนื่องหรือมีจุดรองรับต่างออกไป ต้องใช้ผลวิเคราะห์จากโปรแกรมโครงสร้างจริงแทน</div></li>
+    </ul>
+  </div>
+</div>
+</div>
+</div>
+
+<footer>
+  T-Beam Flange Width &amp; Load Capacity Checker — อ้างอิง ACI 318-19, มยผ. 1103-61, วสท. 1008-38<br>
+  ใช้เพื่อการศึกษาและตรวจสอบเบื้องต้น — การออกแบบจริงต้องตรวจสอบโดยวิศวกรผู้มีใบอนุญาตประกอบวิชาชีพ
+</footer>
+
+<script>
+/* ─── helpers ─── */
+function gv(id){ return parseFloat(document.getElementById(id).value)||0; }
+function gi(id){ return parseInt(document.getElementById(id).value)||0; }
+function fmt(v,d=1){ return isFinite(v)?v.toLocaleString('th-TH',{minimumFractionDigits:d,maximumFractionDigits:d}):'—'; }
+
+let btype = 'interior';
+function setType(t){
+  btype = t;
+  document.getElementById('tg-int').classList.toggle('on', t==='interior');
+  document.getElementById('tg-edg').classList.toggle('on', t==='edge');
+  document.getElementById('edge-field').style.display = t==='edge'?'block':'none';
+  document.getElementById('lbl-s').innerHTML =
+    t==='interior'
+      ? 'ระยะห่างคานข้างเคียง s (c/c) <span class="hint">สมมาตรทั้งสองข้าง</span>'
+      : 'ระยะห่างถึงคานข้างเคียง s <span class="hint">ด้านที่มีพื้นต่อเนื่อง</span>';
+}
+
+let rtype = 'singly';
+function setRtype(t){
+  rtype = t;
+  document.getElementById('tg-sng').classList.toggle('on', t==='singly');
+  document.getElementById('tg-dbl').classList.toggle('on', t==='doubly');
+  document.getElementById('fld-Asp').style.display = t==='doubly'?'block':'none';
+  document.getElementById('fld-dp').style.display  = t==='doubly'?'block':'none';
+  run();
+}
+
+let loadMode = 'factored';
+let lastWuGov = 0;
+function setLoadMode(m){
+  loadMode = m;
+  document.getElementById('tg-wfac').classList.toggle('on', m==='factored');
+  document.getElementById('tg-wsvc').classList.toggle('on', m==='service');
+  document.getElementById('fld-Wu').style.display = m==='factored'?'block':'none';
+  document.getElementById('fld-DL').style.display = m==='service'?'block':'none';
+  document.getElementById('fld-LL').style.display = m==='service'?'block':'none';
+  run();
+}
+function fillCapacity(){
+  document.getElementById('WuInput').value = lastWuGov.toFixed(4);
+  if(loadMode!=='factored') setLoadMode('factored'); else run();
+}
+
+/* ─── Flexural strength solver (handles Singly / Doubly, T-beam or rectangular) ───
+   Es assumed = 2,000,000 ksc (standard modulus of elasticity for reinforcing steel).
+   Returns a (stress block depth), c (neutral axis depth), fsp (stress in As'),
+   Mn (kgf·m), caseLabel (A=NA in flange, B=NA in web), et (net tensile strain) */
+function solveFlexure(As,Asp,dp,d,fy,fc,bf,bw,hf,beta1){
+  const Es = 2000000;
+  function trial(AspEff){
+    let caseLabel='A';
+    let a = (As*fy - AspEff*fy)/(0.85*fc*bf);
+    if(a > hf){ caseLabel='B'; a = (As*fy - AspEff*fy - 0.85*fc*(bf-bw)*hf)/(0.85*fc*bw); }
+    return {a,caseLabel};
+  }
+  let {a,caseLabel} = trial(Asp);
+  let bEff = caseLabel==='A' ? bf : bw;
+  let c = a/beta1;
+  let fsp = (Asp>0 && c>0) ? 0.003*Es*(c-dp)/c : 0;
+
+  if(Asp>0 && fsp<fy){
+    if(fsp>=0){
+      // partial yield — solve quadratic force-equilibrium for exact c
+      const flangeTerm = caseLabel==='B' ? 0.85*fc*(bf-bw)*hf : 0;
+      const A_ = 0.85*fc*bEff*beta1;
+      const B_ = 0.003*Es*Asp - (As*fy - flangeTerm);
+      const C_ = -0.003*Es*Asp*dp;
+      const disc = Math.max(B_*B_ - 4*A_*C_, 0);
+      c = A_>0 ? (-B_ + Math.sqrt(disc)) / (2*A_) : c;
+      a = beta1*c;
+      fsp = c>0 ? 0.003*Es*(c-dp)/c : 0;
+      if(fsp<0){
+        // still not in compression → As' ineffective, revert to pure singly solution
+        ({a,caseLabel} = trial(0)); bEff = caseLabel==='A'?bf:bw; c = a/beta1; fsp=0;
+      }
+    } else {
+      // c < d' entirely → compression steel sits within/beyond the tension side → not effective
+      ({a,caseLabel} = trial(0)); bEff = caseLabel==='A'?bf:bw; c = a/beta1; fsp=0;
+    }
+  }
+  if(fsp>fy) fsp=fy;
+
+  let Mn;
+  if(caseLabel==='A'){
+    Mn = (0.85*fc*bf*a*(d-a/2) + Asp*fsp*(d-dp)) / 100; // kgf·cm → kgf·m
+  } else {
+    Mn = (0.85*fc*(bf-bw)*hf*(d-hf/2) + 0.85*fc*bw*a*(d-a/2) + Asp*fsp*(d-dp)) / 100;
+  }
+  const et = c>0 ? 0.003*(d-c)/c : 99;
+  return {a,c,fsp,Mn,caseLabel,et,yields:(fsp>=fy*0.999), Asp_effective: fsp>0};
+}
+
+function chkCard(status, name, formula, note, ref){
+  const cls = status==='pass'?'ok': status==='fail'?'bad': status==='warn'?'warn':'info';
+  const bdg = status==='pass'
+    ? '<span class="bdg pass">PASS ✓</span>'
+    : status==='fail'
+    ? '<span class="bdg fail">FAIL ✗</span>'
+    : status==='warn'
+    ? '<span class="bdg warn">⚠ WARN</span>'
+    : '<span class="bdg gov">INFO</span>';
+  return `<div class="chk ${cls}">
+    <div class="ch"><span class="nm">${name}</span>${bdg}</div>
+    <div class="formula">${formula}</div>
+    ${note?`<div class="note">${note}</div>`:''}
+    ${ref?`<div class="ref">📌 ${ref}</div>`:''}
+  </div>`;
+}
+
+function govCard(name, formula, note, ref){
+  return `<div class="chk info" style="border-left-color:#f59e0b;border-left-width:4px">
+    <div class="ch"><span class="nm">${name}</span><span class="bdg gov" style="background:#fef3c7;color:#92400e">GOVERNS ★</span></div>
+    <div class="formula">${formula}</div>
+    ${note?`<div class="note">${note}</div>`:''}
+    ${ref?`<div class="ref">📌 ${ref}</div>`:''}
+  </div>`;
+}
+
+/* ─── MAIN ─── */
+function run(){
+  const L   = gv('L'),   s    = gv('s'),   s_e  = gv('s_e');
+  const bw  = gv('bw'),  h    = gv('h'),   d    = gv('d'),   hf   = gv('hf');
+  const fc  = gv('fc'),  fy   = gv('fy'),  fyt  = gv('fyt');
+  const As  = gv('As'),  sv   = gv('sv'),  cover= gv('cover');
+  const stirDia  = parseFloat(document.getElementById('stirDia').value);
+  const stirLegs = parseInt(document.getElementById('stirLegs').value);
+  const Asp = rtype==='doubly' ? gv('Asp') : 0;
+  const dp  = rtype==='doubly' ? gv('dp')  : 0;
+  const flDia = parseFloat(document.getElementById('flDia').value);
+  const flSpacing = gv('flSpacing');
+
+  /* ── β₁ ── */
+  const beta1 = fc<=280 ? 0.85 : Math.max(0.65, 0.85-0.05*(fc-280)/70);
+
+  /* ═════════════════════════════════════════
+     1. EFFECTIVE FLANGE WIDTH
+  ═════════════════════════════════════════ */
+  let cands, bf;
+  if(btype==='interior'){
+    cands = [
+      { lbl:'bf ≤ L/4', val: L/4,
+        f:`L/4 = ${L}/4 = <b>${fmt(L/4,1)} cm</b>`,
+        note:'จำกัดด้วย 1/4 ของช่วงคาน — สะท้อนผลของ shear-lag: หน่วยแรงในปีกจะลดลงเมื่อห่างจากคอคาน ค่า L/4 เป็นระยะที่ถือว่าปีกยังมีส่วนร่วมอย่างมีนัยสำคัญ',
+        ref:'ACI 318-19 ข้อ 6.3.2.1(a)' },
+      { lbl:'bf ≤ bw + 16hf', val: bw+16*hf,
+        f:`bw + 16hf = ${bw} + 16×${hf} = <b>${fmt(bw+16*hf,1)} cm</b>`,
+        note:'จำกัดด้วยความหนาปีก — ปีกที่บางเกินไปไม่สามารถถ่ายแรงอัดเข้าสู่คอคานได้ไกล ค่านี้สมมาตรทั้งสองข้าง (ข้างละ 8hf)',
+        ref:'ACI 318-19 ข้อ 6.3.2.1(b)' },
+      { lbl:'bf ≤ bw + s (c/c spacing)', val: bw+s,
+        f:`bw + s = ${bw} + ${s} = <b>${fmt(bw+s,1)} cm</b>`,
+        note:'จำกัดด้วยระยะห่างคาน — ป้องกันปีกของคานสองตัวทับซ้อนกัน (กรณีคานกลางจะใช้ระยะ c/c เต็ม)',
+        ref:'ACI 318-19 ข้อ 6.3.2.1(c)' },
+    ];
+  } else {
+    cands = [
+      { lbl:'bf ≤ bw + L/12', val: bw+L/12,
+        f:`bw + L/12 = ${bw} + ${L}/12 = <b>${fmt(bw+L/12,1)} cm</b>`,
+        note:'คานริมมีปีกด้านเดียว ขีดจำกัดลดลงจาก L/4 เหลือ L/12 (≈ ครึ่งข้างเดียวของ 2×L/12 = L/6)',
+        ref:'ACI 318-19 ข้อ 6.3.2.2(a)' },
+      { lbl:'bf ≤ bw + 6hf', val: bw+6*hf,
+        f:`bw + 6hf = ${bw} + 6×${hf} = <b>${fmt(bw+6*hf,1)} cm</b>`,
+        note:'ปีกด้านเดียวจำกัดด้วย 6hf (ครึ่งหนึ่งของ 16hf สำหรับคานกลาง)',
+        ref:'ACI 318-19 ข้อ 6.3.2.2(b)' },
+      { lbl:'bf ≤ bw + s_e/2', val: bw+s_e/2,
+        f:`bw + s_e/2 = ${bw} + ${s_e}/2 = <b>${fmt(bw+s_e/2,1)} cm</b>`,
+        note:'จำกัดด้วยครึ่งระยะถึงขอบพื้นหรือคานข้างเคียงด้านที่มีปีก',
+        ref:'ACI 318-19 ข้อ 6.3.2.2(c)' },
+    ];
+  }
+  const minIdx = cands.reduce((mi,c,i,a)=>c.val<a[mi].val?i:mi, 0);
+  bf = cands[minIdx].val;
+
+  let fhtml = '';
+  cands.forEach((c,i)=>{
+    if(i===minIdx){
+      fhtml += govCard(c.lbl, c.f, c.note, c.ref);
+    } else {
+      fhtml += chkCard('pass', c.lbl, c.f, c.note, c.ref);
+    }
+  });
+  fhtml += `<div class="notebox">💡 <b>หลักการ:</b> ค่าที่น้อยที่สุดจากทั้ง ${cands.length} เงื่อนไขคือ bf ที่ใช้ออกแบบ เนื่องจากการกระจายหน่วยแรงอัดในปีกไม่สม่ำเสมอตลอดความกว้างจริง (shear-lag effect) การใช้ค่า bf ที่เล็กกว่าจึงเป็นการออกแบบที่ปลอดภัย</div>`;
+  document.getElementById('flange-result').innerHTML = fhtml;
+
+  /* ═════════════════════════════════════════
+     2. CODE COMPLIANCE CHECKS
+  ═════════════════════════════════════════ */
+
+  // As,min
+  const Asmin_a = (0.25*Math.sqrt(fc)/fy)*bw*d;
+  const Asmin_b = (14/fy)*bw*d;
+  const Asmin   = Math.max(Asmin_a, Asmin_b);
+  const minOK   = As >= Asmin;
+
+  // Strain / ductility & flexural strength — unified solver (handles Singly/Doubly + T-beam case)
+  const flex = solveFlexure(As,Asp,dp,d,fy,fc,bf,bw,hf,beta1);
+  const a_na = flex.a, c_na = flex.c, et = flex.et;
+  const ductOK = et >= 0.004;
+
+  // Stirrup spacing limits
+  const Vc_kgf = 0.53*Math.sqrt(fc)*bw*d;
+  const Av     = stirLegs * Math.PI*stirDia*stirDia/4;
+  const Vs_kgf = sv>0 ? (Av*fyt*d)/sv : 0;
+  const Vs_lim = 0.33*Math.sqrt(fc)*bw*d;
+  const smax   = Vs_kgf<=Vs_lim ? Math.min(d/2,60) : Math.min(d/4,30);
+  const spacOK = sv <= smax;
+
+  // Cover / stirrup fit
+  const clear_inside = bw - 2*cover - 2*stirDia;
+  const coverOK = clear_inside >= 2.5;
+
+  // hf practical minimum
+  const hfOK = hf >= 8;
+
+  // Flange thickness vs bw (hf ≥ bw/8 suggested by some references for shear transfer at web-flange junction)
+  const hfWebOK = hf >= bw/8;
+
+  let ohtml = '';
+  ohtml += chkCard(minOK?'pass':'fail',
+    'เหล็กเสริมรับแรงดัดขั้นต่ำ As,min',
+    `As,min = max(0.25√f'c/fy·bw·d, 14/fy·bw·d)<br>
+     = max(${fmt(Asmin_a,3)}, ${fmt(Asmin_b,3)}) = <b>${fmt(Asmin,3)} cm²</b><br>
+     As ที่ใช้จริง = <b>${fmt(As,2)} cm²</b> → ${minOK?'✓ OK':'✗ ไม่เพียงพอ'}`,
+    'ใช้ bw (ไม่ใช่ bf) เพราะเหล็กขั้นต่ำป้องกันการวิบัติเปราะของคอคานรับแรงดึง ค่าใดมากกว่าระหว่าง 0.25√f\'c และ 14 จะเป็นตัวควบคุม',
+    'ACI 318-19 ข้อ 9.6.1.2'
+  );
+  ohtml += chkCard(ductOK?'pass':'fail',
+    'ความเหนียว: Net Tensile Strain ε_t',
+    `a = ${fmt(a_na,2)} cm → c = a/β₁ = ${fmt(a_na,2)}/${fmt(beta1,3)} = <b>${fmt(c_na,2)} cm</b><br>
+     ε_t = 0.003×(d−c)/c = 0.003×(${d}−${fmt(c_na,2)})/${fmt(c_na,2)} = <b>${et.toFixed(4)}</b><br>
+     เงื่อนไข: ε_t ${ductOK?'≥':'<'} 0.004 (minimum for flexural member)
+     ${Asp>0?`<br>As′=${fmt(Asp,2)} cm² ที่ d′=${dp} cm → fs′=<b>${fmt(flex.fsp,0)} ksc</b> (${flex.yields?'ครากแล้ว, fs′=fy':'ยังไม่คราก ใช้ค่าจากสมดุลแรง'})`:''}`,
+    'ε_t ≥ 0.005 → tension-controlled (φ=0.90), 0.004≤ε_t<0.005 → transition zone (φ ลดลง), ε_t<0.004 → ไม่ยอมรับสำหรับ non-prestressed flexural member',
+    'ACI 318-19 ตาราง 21.2.2 และข้อ 21.2.1'
+  );
+  ohtml += chkCard('info',
+    'β₁ — ปัจจัยรูปทรงบล็อกความเค้น (Whitney Stress Block)',
+    `f'c = ${fc} ksc ${fc<=280?'≤':'>'} 280 ksc<br>β₁ = ${fc<=280?'0.85 (คงที่เมื่อ f\'c ≤ 280 ksc)':'0.85 − 0.05×(f\'c−280)/70 = '+fmt(beta1,3)+' ≥ 0.65'}`,
+    'β₁ แปลง c (ความลึกแกนสะเทิน) ไปเป็น a (ความลึกบล็อกความเค้นเทียบเท่า Whitney) ผ่าน a=β₁·c ค่าลดลงเมื่อคอนกรีตมีกำลังสูงขึ้นเพราะความโค้งกราฟความเค้น-ความเครียดเปลี่ยนรูปร่าง',
+    'ACI 318-19 ตาราง 22.2.2.4.3'
+  );
+  ohtml += chkCard(spacOK?'pass':'fail',
+    'ระยะห่างเหล็กปลอกสูงสุด s_max',
+    `Vs = ${fmt(Vs_kgf,0)} kgf, Vs_limit = 0.33√f'c·bw·d = ${fmt(Vs_lim,0)} kgf<br>
+     s_max = ${Vs_kgf<=Vs_lim?'min(d/2, 60cm)':'min(d/4, 30cm)'} = <b>${fmt(smax,1)} cm</b><br>
+     s ที่ใช้จริง = ${sv} cm → ${spacOK?'✓ OK':'✗ ต้องลดระยะห่าง'}`,
+    'เมื่อ Vs เกิน 0.33√f\'c·bw·d ต้องลดระยะห่างปลอกลงครึ่งหนึ่ง เพื่อให้แต่ละรอยร้าวเฉือนถูกตัดผ่านโดยปลอกอย่างน้อย 1 เส้น',
+    'ACI 318-19 ข้อ 9.7.6.2.2'
+  );
+  ohtml += chkCard(coverOK?'pass':'fail',
+    'ที่ว่างภายในเหล็กปลอก (Stirrup Internal Clear Width)',
+    `bw − 2×cover − 2×Øst = ${bw} − ${fmt(2*cover,1)} − ${fmt(2*stirDia,2)} = <b>${fmt(clear_inside,2)} cm</b><br>
+     เงื่อนไข: ≥ 2.5 cm (ขั้นต่ำเชิงปฏิบัติ) → ${coverOK?'✓ OK':'✗ คอคานแคบเกินไป'}`,
+    'พื้นที่ภายในปลอกต้องพอให้วางเหล็กหลัก เทและจี้คอนกรีตได้ โดยยังมีระยะหุ้มครบ',
+    'ACI 318-19 ข้อ 20.5.1 (Cover) + 26.4.2 (Consolidation)'
+  );
+  ohtml += chkCard(hfOK?'pass':'warn',
+    'ความหนาแผ่นพื้นขั้นต่ำ hf ≥ 8 cm (แนวปฏิบัติ)',
+    `hf = ${hf} cm ${hfOK?'≥':'<'} 8 cm`,
+    'ACI 318 ไม่กำหนดตัวเลขนี้โดยตรงใน T-beam section แต่ในทางปฏิบัติพื้นบางกว่า 8 ซม. มีความเสี่ยงด้านรอยร้าว การซึมของน้ำ และการวางเหล็กเสริมพื้น',
+    'มยผ. 1103-61 + แนวปฏิบัติทั่วไป'
+  );
+  ohtml += chkCard(hfWebOK?'pass':'warn',
+    'อัตราส่วนความหนาปีกต่อคอคาน hf ≥ bw/8',
+    `hf = ${hf} cm, bw/8 = ${bw}/8 = <b>${fmt(bw/8,2)} cm</b> → ${hfWebOK?'✓ OK':'⚠ พิจารณาเพิ่มความหนาปีก'}`,
+    'ตรวจสอบการถ่ายแรงเฉือนที่รอยต่อระหว่างปีกและคอคาน (flange-web interface) — ปีกที่บางเกินไปเทียบกับ bw อาจมีปัญหา longitudinal shear failure ที่รอยต่อ',
+    'ACI 318-19 ข้อ 16.4 (Interface Shear) + ข้อ R6.3.2 (Commentary)'
+  );
+  // Flange transverse reinforcement
+  const As_fl_prov = (Math.PI*flDia*flDia/4) * (100/flSpacing); // cm²/m
+  const rho_min = fy<=4200 ? 0.0018 : Math.max(0.0018*4200/fy, 0.0014);
+  const As_fl_min = rho_min*hf*100; // cm²/m
+  const flAreaOK = As_fl_prov >= As_fl_min;
+  const fl_smax = Math.min(5*hf, 45);
+  const flSpacOK = flSpacing <= fl_smax;
+  ohtml += chkCard((flAreaOK&&flSpacOK)?'pass':'fail',
+    'เหล็กเสริมตามขวางบริเวณปีกคาน (Flange Transverse Reinforcement)',
+    `As,f ที่จัดวางจริง = (π×${flDia}²/4)×(100/${flSpacing}) = <b>${fmt(As_fl_prov,3)} cm²/m</b><br>
+     As,f,min (เทียบเท่าเหล็กหดตัว-อุณหภูมิ) = ρmin×hf×100 = ${rho_min.toFixed(4)}×${hf}×100 = <b>${fmt(As_fl_min,3)} cm²/m</b> → ${flAreaOK?'✓ OK':'✗ ไม่พอ'}<br>
+     ระยะห่างสูงสุด s_max = min(5hf, 45) = min(${fmt(5*hf,1)}, 45) = <b>${fmt(fl_smax,1)} cm</b>, ใช้จริง s_f = ${flSpacing} cm → ${flSpacOK?'✓ OK':'✗ ห่างเกินไป'}`,
+    'เหล็กปีกตามขวาง (วางในแนวขนานพื้น ตั้งฉากกับแนวแกนคาน) ทำหน้าที่ถ่ายแรงจากการทำงานแบบปีกยื่น (flange cantilever action) เข้าสู่คอคาน และควบคุมรอยร้าวตามยาวที่รอยต่อปีก-คอคาน',
+    'ACI 318-19 ข้อ 7.5.2.3 (แนวคิดเดียวกับข้อ 8.10.5.2 เดิม)'
+  );
+  document.getElementById('code-checks').innerHTML = ohtml;
+
+  /* ═════════════════════════════════════════
+     3. LOAD CAPACITY
+  ═════════════════════════════════════════ */
+  const phi_f = (et>=0.005) ? 0.90 : (et>=0.004) ? 0.65+250/3*(et-0.004) : 0.65;
+  const phi_v = 0.75;
+
+  // φMn — T-beam flexure (reuse unified solver; handles Singly/Doubly automatically)
+  const a_mn = flex.a;
+  const Mn   = flex.Mn;
+  let caseTxt = flex.caseLabel==='A'
+    ? `Case A — NA อยู่ในปีก (a=${fmt(a_mn,2)} cm ≤ hf=${hf} cm) → คำนวณแบบสี่เหลี่ยมกว้าง bf`
+    : `Case B — NA อยู่ในคอคาน (a=${fmt(a_mn,2)} cm > hf=${hf} cm) → คำนวณแบบ T-section เต็มรูป`;
+  if(Asp>0){
+    caseTxt += ` &nbsp;| รูปแบบ: <b>Doubly Reinforced</b> (As′=${fmt(Asp,2)} cm² ที่ d′=${dp} cm, fs′=${fmt(flex.fsp,0)} ksc)`;
+  } else {
+    caseTxt += ` &nbsp;| รูปแบบ: <b>Singly Reinforced</b>`;
+  }
+  const phiMn = phi_f * Mn;
+
+  // φVn
+  const phiVn = phi_v*(Vc_kgf + Vs_kgf);
+
+  // Wu from each limit (kgf/m, L in cm → m)
+  const Lm = L/100;
+  const Wu_M = (8*phiMn)/( Lm*Lm );       // kgf/m from moment
+  const Wu_V = (2*phiVn)/( Lm );           // kgf/m from shear
+  const Wu_gov = Math.min(Wu_M, Wu_V);
+  const govBy  = Wu_M <= Wu_V ? 'Flexure (โมเมนต์ดัด)' : 'Shear (แรงเฉือน)';
+
+  const Wu_ton_M   = Wu_M/1000;
+  const Wu_ton_V   = Wu_V/1000;
+  const Wu_ton_gov = Wu_gov/1000;
+  const Ws_ton     = Wu_ton_gov/1.5; // approx service
+  lastWuGov = Wu_ton_gov; // stash for the "fillCapacity" helper button
+
+  // Applied load check — user-specified Wu (factored) or DL+LL (service, auto-factored)
+  const DLval = loadMode==='service' ? gv('DL') : 0;
+  const LLval = loadMode==='service' ? gv('LL') : 0;
+  const Wu_applied_ton = loadMode==='service' ? (1.2*DLval + 1.6*LLval) : gv('WuInput');
+  const Wu_applied_kgf = Wu_applied_ton*1000;
+  const Vu_applied = Wu_applied_kgf*Lm/2;      // kgf
+  const Mu_applied = Wu_applied_kgf*Lm*Lm/8;   // kgf·m
+  const DCR_V = phiVn>0 ? Vu_applied/phiVn : 0;
+  const DCR_M = phiMn>0 ? Mu_applied/phiMn : 0;
+
+  let alHtml = '';
+  if(Wu_applied_ton<=0){
+    alHtml = `<div class="banner info"><div class="ico">ℹ️</div><div>
+      <strong>ยังไม่ได้ระบุน้ำหนักบรรทุก</strong>
+      <span>กรอกค่า Wu หรือ DL/LL ทางซ้ายมือ เพื่อตรวจสอบว่าคานหน้าตัดนี้รับน้ำหนักได้หรือไม่ (กำลังสูงสุดที่คานรับได้ปัจจุบัน Wu,allow = ${fmt(Wu_ton_gov,3)} ตัน/ม.)</span>
+    </div></div>`;
+  } else {
+    const passAll = DCR_M<=1 && DCR_V<=1;
+    const worseDCR = Math.max(DCR_M,DCR_V);
+    alHtml = `<div class="banner ${passAll?'pass':'fail'}">
+      <div class="ico">${passAll?'✅':'❌'}</div>
+      <div>
+        <strong>${passAll?'คานรับน้ำหนักที่ระบุได้ (ปลอดภัย)':'คานรับน้ำหนักที่ระบุไม่ได้ — เกินกำลัง!'}</strong>
+        <span>Wu ที่ตรวจสอบ = ${fmt(Wu_applied_ton,3)} ตัน/ม.${loadMode==='service'?` (จาก 1.2×${fmt(DLval,2)} + 1.6×${fmt(LLval,2)})`:''} | Wu,allow = ${fmt(Wu_ton_gov,3)} ตัน/ม. | DCR สูงสุด = ${worseDCR.toFixed(2)} (${DCR_M>=DCR_V?'โมเมนต์':'แรงเฉือน'}ควบคุม)</span>
+      </div>
+    </div>`;
+    alHtml += chkCard(DCR_M<=1?'pass':'fail',
+      'ตรวจสอบโมเมนต์ดัด (Flexure Check)',
+      `Mu = Wu×L²/8 = ${fmt(Wu_applied_kgf,0)}×${fmt(Lm,2)}²/8 = <b>${fmt(Mu_applied,0)} kgf·m</b> (${fmt(Mu_applied/1000,3)} ตัน·ม.)<br>
+       φMn = <b>${fmt(phiMn,0)} kgf·m</b> → DCR = Mu/φMn = <b>${DCR_M.toFixed(3)}</b> ${DCR_M<=1?'≤ 1.0 ✓ OK':'> 1.0 ✗ เกินกำลัง'}`,
+      null, null
+    );
+    alHtml += chkCard(DCR_V<=1?'pass':'fail',
+      'ตรวจสอบแรงเฉือน (Shear Check)',
+      `Vu = Wu×L/2 = ${fmt(Wu_applied_kgf,0)}×${fmt(Lm,2)}/2 = <b>${fmt(Vu_applied,0)} kgf</b> (${fmt(Vu_applied/1000,3)} ตัน)<br>
+       φVn = <b>${fmt(phiVn,0)} kgf</b> → DCR = Vu/φVn = <b>${DCR_V.toFixed(3)}</b> ${DCR_V<=1?'≤ 1.0 ✓ OK':'> 1.0 ✗ เกินกำลัง'}`,
+      null, null
+    );
+  }
+  document.getElementById('applied-load-result').innerHTML = alHtml;
+
+  // Print report header
+  document.getElementById('ph-proj').textContent = document.getElementById('projName').value || '—';
+  document.getElementById('ph-mark').textContent = document.getElementById('beamMark').value || '—';
+  document.getElementById('ph-eng').textContent  = document.getElementById('engName').value || '—';
+  document.getElementById('ph-date').textContent = new Date().toLocaleDateString('th-TH', {year:'numeric',month:'long',day:'numeric'});
+
+  // Summary cards
+  document.getElementById('sum-grid').style.display='grid';
+  document.getElementById('s-bf').textContent = fmt(bf,1);
+  document.getElementById('s-mn').textContent = fmt(phiMn,0);
+  document.getElementById('s-vn').textContent = fmt(phiVn,0);
+  document.getElementById('s-wm').textContent = fmt(Wu_ton_M,3);
+  document.getElementById('s-wv').textContent = fmt(Wu_ton_V,3);
+  document.getElementById('s-wg').textContent = fmt(Wu_ton_gov,3);
+
+  // Banner
+  const allOK = minOK && ductOK && spacOK && coverOK && flAreaOK && flSpacOK;
+  document.getElementById('banner-area').innerHTML=`
+    <div class="banner ${allOK?'pass':'fail'}">
+      <div class="ico">${allOK?'✅':'⚠️'}</div>
+      <div>
+        <strong>${allOK?'หน้าตัดผ่านข้อบังคับทั้งหมด':'มีข้อบังคับที่ไม่ผ่าน — ดูรายละเอียดด้านล่าง'}</strong>
+        <span>bf = ${fmt(bf,1)} cm | Wu,allow = ${fmt(Wu_ton_gov,3)} ตัน/ม. | ควบคุมโดย ${govBy}</span>
+      </div>
+    </div>`;
+
+  // Load result
+  let lhtml = '';
+  lhtml += chkCard('info',
+    'กำลังรับโมเมนต์ดัด (Flexural Capacity)',
+    `${caseTxt}<br>
+     a = <b>${fmt(a_mn,2)} cm</b>, c = a/β₁ = ${fmt(a_mn,2)}/${fmt(beta1,3)} = <b>${fmt(a_mn/beta1,2)} cm</b>, ε_t = <b>${et.toFixed(4)}</b>, φ = <b>${phi_f.toFixed(3)}</b><br>
+     Mn = <b>${fmt(Mn,1)} kgf·m</b>, φMn = φ×Mn = <b>${fmt(phiMn,1)} kgf·m</b><br>
+     → Wu,M = 8×φMn / L² = 8×${fmt(phiMn,0)} / ${fmt(Lm,2)}² = <b>${fmt(Wu_ton_M,4)} ตัน/ม.</b>`,
+    'สมมติฐาน: คานช่วงเดียว (simply supported) รับน้ำหนักแผ่กระจายสม่ำเสมอ → Mu,max = Wu·L²/8 ณ กึ่งกลางช่วง',
+    'ACI 318-19 ข้อ 22.2–22.3'
+  );
+  lhtml += chkCard('info',
+    'กำลังรับแรงเฉือน (Shear Capacity)',
+    `Vc = 0.53√f'c·bw·d = 0.53×√${fc}×${bw}×${d} = <b>${fmt(Vc_kgf,1)} kgf</b><br>
+     Av = ${stirLegs} ขา × π×${stirDia}²/4 = <b>${fmt(Av,4)} cm²</b><br>
+     Vs = Av×fyt×d / sv = ${fmt(Av,4)}×${fyt}×${d} / ${sv} = <b>${fmt(Vs_kgf,1)} kgf</b><br>
+     φVn = φ×(Vc+Vs) = 0.75×(${fmt(Vc_kgf,1)}+${fmt(Vs_kgf,1)}) = <b>${fmt(phiVn,1)} kgf</b><br>
+     → Wu,V = 2×φVn / L = 2×${fmt(phiVn,0)} / ${fmt(Lm,2)} = <b>${fmt(Wu_ton_V,4)} ตัน/ม.</b>`,
+    'แรงเฉือนสูงสุด = Wu·L/2 ที่ปลายคาน (simply supported) สมการ Vc ใช้ bw เพราะแรงเฉือนถ่ายผ่านคอคานเท่านั้น',
+    'ACI 318-19 ข้อ 22.5.5.1 + 22.5.8.5'
+  );
+  lhtml += `<div class="chk ${Wu_M<=Wu_V?'bad':'ok'}" style="border-left-width:4px;border-left-color:${Wu_M<=Wu_V?'var(--blue)':'var(--green)'}">
+    <div class="ch"><span class="nm">⚖️ น้ำหนักบรรทุกสูงสุดที่คานรับได้ (Governing)</span>
+      <span class="bdg" style="background:#d1fae5;color:#065f46;font-size:12px;padding:3px 12px">${fmt(Wu_ton_gov,4)} ตัน/ม.</span>
+    </div>
+    <div class="formula">min(Wu,M, Wu,V) = min(${fmt(Wu_ton_M,4)}, ${fmt(Wu_ton_V,4)}) = <b>${fmt(Wu_ton_gov,4)} ตัน/ม.</b> (ควบคุมโดย ${govBy})</div>
+    <div class="note">
+      <b>นี่คือน้ำหนักบรรทุกแบบประลัย (Factored Load, Wu)</b> ตาม LRFD (Wu = 1.2DL + 1.6LL)<br>
+      ประมาณน้ำหนักใช้งาน (Service Load): Ws ≈ Wu / 1.5 = <b>${fmt(Ws_ton,3)} ตัน/ม.</b>
+      <span style="font-size:11px;color:var(--gray-500)"> (ค่าประมาณ — ขึ้นกับสัดส่วน DL:LL จริง)</span><br>
+      <span style="font-size:11px;color:var(--gray-500)">⚠ สมมติฐาน: Simply supported beam, Uniformly Distributed Load (UDL) — ถ้าโครงสร้างต่างออกไปให้ปรับสูตรตามนั้น</span>
+    </div>
+    <div class="ref">📌 ผลรวมจากทั้งเงื่อนไขโมเมนต์ (ACI 318-19 ข้อ 9.4.1.1) และแรงเฉือน (ข้อ 9.4.3.1)</div>
+  </div>`;
+  document.getElementById('load-result').innerHTML = lhtml;
+
+  /* ── SVG ── */
+  drawSVG({bw,h,hf,bf,d,cover,stirDia,stirLegs,a_mn,As,Asp,dp,rtype});
+
+  /* ── SFD / BMD ── */
+  drawDiagrams(Lm, Wu_applied_kgf, phiMn, phiVn);
+}
+
+/* ─── SFD / BMD DIAGRAM DRAWING ─── */
+function drawDiagrams(Lm, Wu, phiMn, phiVn){
+  const Vmax = Wu*Lm/2;                 // kgf
+  const Mmax = Wu*Lm*Lm/8;              // kgf·m
+  const DCR_V = phiVn>0 ? Vmax/phiVn : 0;
+  const DCR_M = phiMn>0 ? Mmax/phiMn : 0;
+
+  const W=680, H=210, padL=64, padR=34, padT=26, padB=30;
+  const plotW = W-padL-padR, plotH = H-padT-padB;
+  const xScale = Lm>0 ? plotW/Lm : 0;
+
+  /* ---- Shear diagram ---- */
+  const vAbsMax = Math.max(Vmax, phiVn, 1)*1.15;
+  const vMidY = padT+plotH/2;
+  const vScale = (plotH/2)/vAbsMax;
+  const vColor = DCR_V>1 ? '#e02424' : '#1a56db';
+  const v0 = vMidY - Vmax*vScale;
+  const vL = vMidY + Vmax*vScale;
+  const vCapTopY = vMidY - phiVn*vScale;
+  const vCapBotY = vMidY + phiVn*vScale;
+
+  const shearSVG = `<svg width="100%" viewBox="0 0 ${W} ${H}" style="max-width:660px">
+    <line x1="${padL}" y1="${vMidY}" x2="${padL+plotW}" y2="${vMidY}" stroke="#94a3b8" stroke-width="1"/>
+    <line x1="${padL}" y1="${vCapTopY}" x2="${padL+plotW}" y2="${vCapTopY}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="5 3"/>
+    <line x1="${padL}" y1="${vCapBotY}" x2="${padL+plotW}" y2="${vCapBotY}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="5 3"/>
+    <polygon points="${padL},${vMidY} ${padL},${v0} ${padL+plotW},${vL} ${padL+plotW},${vMidY}" fill="${vColor}" opacity="0.16"/>
+    <polyline points="${padL},${v0} ${padL+plotW},${vL}" fill="none" stroke="${vColor}" stroke-width="2.2"/>
+    <circle cx="${padL}" cy="${vMidY}" r="3" fill="#334155"/>
+    <circle cx="${padL+plotW}" cy="${vMidY}" r="3" fill="#334155"/>
+    <text x="${padL-6}" y="${v0+4}" text-anchor="end" font-size="10.5" font-weight="700" fill="${vColor}">+${fmt(Vmax,0)}</text>
+    <text x="${padL-6}" y="${vL+4}" text-anchor="end" font-size="10.5" font-weight="700" fill="${vColor}">−${fmt(Vmax,0)}</text>
+    <text x="${padL+plotW+4}" y="${vCapTopY+3}" font-size="9" fill="#b45309">φVn</text>
+    <text x="${padL}" y="${H-8}" font-size="10" fill="#64748b">0</text>
+    <text x="${padL+plotW/2}" y="${H-8}" text-anchor="middle" font-size="10" fill="#64748b">L/2</text>
+    <text x="${padL+plotW}" y="${H-8}" text-anchor="end" font-size="10" fill="#64748b">L=${fmt(Lm,2)} m</text>
+  </svg>`;
+
+  /* ---- Moment diagram (parabola) ---- */
+  const mAbsMax = Math.max(Mmax, phiMn, 1)*1.15;
+  const mScale = plotH/mAbsMax;
+  const N=40;
+  let pathPts=[];
+  for(let i=0;i<=N;i++){
+    const x = Lm*i/N;
+    const m = Wu*x*(Lm-x)/2;
+    pathPts.push(`${(padL+x*xScale).toFixed(1)},${(padT+m*mScale).toFixed(1)}`);
+  }
+  const mColor = DCR_M>1 ? '#e02424' : '#057a55';
+  const mCapY = padT + phiMn*mScale;
+  const mPeakY = padT + Mmax*mScale;
+
+  const momentSVG = `<svg width="100%" viewBox="0 0 ${W} ${H}" style="max-width:660px">
+    <line x1="${padL}" y1="${padT}" x2="${padL+plotW}" y2="${padT}" stroke="#94a3b8" stroke-width="1"/>
+    <line x1="${padL}" y1="${mCapY}" x2="${padL+plotW}" y2="${mCapY}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="5 3"/>
+    <polygon points="${padL},${padT} ${pathPts.join(' ')} ${padL+plotW},${padT}" fill="${mColor}" opacity="0.16"/>
+    <polyline points="${pathPts.join(' ')}" fill="none" stroke="${mColor}" stroke-width="2.2"/>
+    <circle cx="${padL+plotW/2}" cy="${mPeakY}" r="3" fill="${mColor}"/>
+    <circle cx="${padL}" cy="${padT}" r="3" fill="#334155"/>
+    <circle cx="${padL+plotW}" cy="${padT}" r="3" fill="#334155"/>
+    <text x="${padL+plotW/2}" y="${mPeakY+16}" text-anchor="middle" font-size="10.5" font-weight="700" fill="${mColor}">Mmax=${fmt(Mmax,0)}</text>
+    <text x="${padL+plotW+4}" y="${mCapY+3}" font-size="9" fill="#b45309">φMn</text>
+    <text x="${padL}" y="${H-8}" font-size="10" fill="#64748b">0</text>
+    <text x="${padL+plotW/2}" y="${H-8}" text-anchor="middle" font-size="10" fill="#64748b">L/2</text>
+    <text x="${padL+plotW}" y="${H-8}" text-anchor="end" font-size="10" fill="#64748b">L=${fmt(Lm,2)} m</text>
+  </svg>`;
+
+  const dcrBadge = (dcr)=> dcr<=1
+    ? `<span class="bdg pass">DCR = ${dcr.toFixed(2)} ✓</span>`
+    : `<span class="bdg fail">DCR = ${dcr.toFixed(2)} ✗</span>`;
+
+  let html = `<div class="notebox">📐 สมมติฐาน: คานช่วงเดียว (Simply Supported) รับน้ำหนักแผ่กระจายสม่ำเสมอ (UDL) ตลอดความยาว L ด้วยน้ำหนักบรรทุกที่ระบุในหัวข้อ "ตรวจสอบน้ำหนักบรรทุกใช้งานจริง" — เส้นประสีส้มคือกำลังรับที่ออกแบบได้ (φVn / φMn) หากค่าจริงเกินกำลังรับ กราฟจะเปลี่ยนเป็นสีแดง</div>`;
+  html += `<div class="chk ${DCR_V<=1?'ok':'bad'}">
+    <div class="ch"><span class="nm">แผนภาพแรงเฉือน (Shear Force Diagram)</span>${dcrBadge(DCR_V)}</div>
+    <div class="svg-wrap" style="background:#fff;padding:6px">${shearSVG}</div>
+    <div class="formula">Vu,max = Wu·L/2 = ${fmt(Wu,0)}×${fmt(Lm,2)}/2 = <b>${fmt(Vmax,0)} kgf</b> (${fmt(Vmax/1000,3)} ตัน) &nbsp;|&nbsp; φVn = <b>${fmt(phiVn,0)} kgf</b></div>
+  </div>`;
+  html += `<div class="chk ${DCR_M<=1?'ok':'bad'}">
+    <div class="ch"><span class="nm">แผนภาพโมเมนต์ดัด (Bending Moment Diagram)</span>${dcrBadge(DCR_M)}</div>
+    <div class="svg-wrap" style="background:#fff;padding:6px">${momentSVG}</div>
+    <div class="formula">Mu,max = Wu·L²/8 = ${fmt(Wu,0)}×${fmt(Lm,2)}²/8 = <b>${fmt(Mmax,0)} kgf·m</b> (${fmt(Mmax/1000,3)} ตัน·ม.) &nbsp;|&nbsp; φMn = <b>${fmt(phiMn,0)} kgf·m</b></div>
+  </div>`;
+  document.getElementById('diagram-result').innerHTML = html;
+}
+
+/* ─── SVG SECTION DRAWING ─── */
+function drawSVG(p){
+  const W=460, H=320, padX=50, padT=50, padB=80;
+  const drawW = W-padX*2-20;
+  const drawH = H-padT-padB;
+  const sc = Math.min(drawW/p.bf, drawH/p.h);
+
+  const fw = p.bf*sc, fh = p.hf*sc, ww = p.bw*sc, wh = (p.h-p.hf)*sc;
+  const cx = W/2;
+  const fx = cx-fw/2, fy = padT;
+  const wx = cx-ww/2, wy = fy+fh;
+  const wb = wy+wh; // web bottom
+
+  // compression zone (a depth)
+  const az = Math.min(p.a_mn*sc, wh+fh);
+  const azInFlange = Math.min(p.a_mn*sc, fh);
+  const azInWeb    = Math.max(0, p.a_mn*sc-fh);
+
+  // bar count estimate from As
+  const barR = Math.max(3, Math.min(7, sc*0.45));
+  const stR  = Math.max(1.5, sc*p.stirDia*0.4);
+  const nBars = Math.max(2, Math.round(p.As / (Math.PI*(0.9*0.9)/4))); // rough guess for visual
+  const barY  = wb - barR - 2;
+  const barSpan = ww - 2*(p.cover*sc+stR);
+  const barStep = nBars>1 ? barSpan/(nBars-1) : 0;
+
+  let bars='';
+  for(let i=0;i<nBars;i++){
+    const bx = wx + p.cover*sc + stR + (nBars===1?barSpan/2:i*barStep);
+    bars+=`<circle cx="${bx}" cy="${barY}" r="${barR}" fill="#1d4ed8" stroke="#1e3a8a" stroke-width="0.6"/>`;
+  }
+
+  // Top compression steel (Doubly reinforced)
+  let topBars='';
+  if(p.rtype==='doubly' && p.Asp>0){
+    const nTopBars = Math.max(2, Math.round(p.Asp / (Math.PI*0.9*0.9/4)));
+    const topBarY  = fy + Math.min(p.dp, p.h-2)*sc;
+    const topSpan  = ww - 2*(p.cover*sc+stR);
+    const topStep  = nTopBars>1 ? topSpan/(nTopBars-1) : 0;
+    for(let i=0;i<nTopBars;i++){
+      const bx = wx + p.cover*sc + stR + (nTopBars===1?topSpan/2:i*topStep);
+      topBars+=`<circle cx="${bx}" cy="${topBarY}" r="${barR}" fill="#dc2626" stroke="#7f1d1d" stroke-width="0.6"/>`;
+    }
+  }
+
+  // Flange transverse reinforcement indicator (bars perpendicular to beam axis, lie in this section plane)
+  const flY = fy + Math.min(p.cover*sc+2, fh*0.5);
+  const flIndicator = `<line x1="${fx+4}" y1="${flY}" x2="${fx+fw-4}" y2="${flY}" stroke="#7c3aed" stroke-width="1.3" stroke-dasharray="4 3"/>`;
+
+  const svg=`<svg width="${W}" height="${H}" viewBox="0 0 ${W} ${H}">
+<defs>
+  <marker id="ar" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto-start-reverse">
+    <path d="M1 1L9 5L1 9" fill="none" stroke="#64748b" stroke-width="1.5"/>
+  </marker>
+  <pattern id="hatch" width="5" height="5" patternUnits="userSpaceOnUse" patternTransform="rotate(45)">
+    <line x1="0" y1="0" x2="0" y2="5" stroke="#fbbf24" stroke-width="1.5" opacity="0.5"/>
+  </pattern>
+</defs>
+
+<!-- Flange -->
+<rect x="${fx}" y="${fy}" width="${fw}" height="${fh}" fill="#bfdbfe" stroke="#1e3a8a" stroke-width="1.2"/>
+<!-- Web -->
+<rect x="${wx}" y="${wy}" width="${ww}" height="${wh}" fill="#93c5fd" stroke="#1e3a8a" stroke-width="1.2"/>
+
+<!-- Compression zone hatch -->
+<rect x="${fx}" y="${fy}" width="${fw}" height="${azInFlange}" fill="url(#hatch)" opacity="0.8"/>
+${azInWeb>0?`<rect x="${wx}" y="${wy}" width="${ww}" height="${azInWeb}" fill="url(#hatch)" opacity="0.8"/>` : ''}
+
+<!-- Stirrups (red rectangle inside web) -->
+<rect x="${wx+p.cover*sc}" y="${wy+p.cover*sc}" width="${ww-2*p.cover*sc}" height="${wh-2*p.cover*sc}"
+  fill="none" stroke="#dc2626" stroke-width="${stR}" rx="3"/>
+
+<!-- d line (dashed) -->
+<line x1="${fx-6}" y1="${fy+p.d*sc}" x2="${fx+fw+6}" y2="${fy+p.d*sc}"
+  stroke="#1a56db" stroke-width="0.8" stroke-dasharray="5 3"/>
+<text x="${fx-8}" y="${fy+p.d*sc+4}" text-anchor="end" font-size="10" fill="#1a56db" font-weight="600">d</text>
+
+<!-- NA line (orange dashed) -->
+<line x1="${wx-4}" y1="${fy+p.a_mn/p.h*(fh+wh)}"
+      x2="${wx+ww+4}" y2="${fy+p.a_mn/p.h*(fh+wh)}"
+  stroke="#f97316" stroke-width="0.8" stroke-dasharray="3 2"/>
+<text x="${wx+ww+6}" y="${fy+p.a_mn/p.h*(fh+wh)+3}" font-size="9" fill="#f97316">a=${p.a_mn.toFixed(1)}</text>
+
+<!-- Flange transverse reinforcement -->
+${flIndicator}
+
+<!-- Bars -->
+${bars}
+${topBars}
+
+<!-- ─ DIMENSION LINES ─ -->
+<!-- bf -->
+<line x1="${fx}" y1="${fy-14}" x2="${fx+fw}" y2="${fy-14}" stroke="#64748b" stroke-width="0.9" marker-end="url(#ar)" marker-start="url(#ar)"/>
+<text x="${cx}" y="${fy-18}" text-anchor="middle" font-size="11" font-weight="700" fill="#0f172a">bf = ${p.bf.toFixed(1)} cm</text>
+
+<!-- bw -->
+<line x1="${wx}" y1="${wb+16}" x2="${wx+ww}" y2="${wb+16}" stroke="#64748b" stroke-width="0.9" marker-end="url(#ar)" marker-start="url(#ar)"/>
+<text x="${cx}" y="${wb+28}" text-anchor="middle" font-size="11" fill="#334155">bw = ${p.bw} cm</text>
+
+<!-- h -->
+<line x1="${fx-22}" y1="${fy}" x2="${fx-22}" y2="${wb}" stroke="#64748b" stroke-width="0.9" marker-end="url(#ar)" marker-start="url(#ar)"/>
+<text x="${fx-26}" y="${fy+(fh+wh)/2}" text-anchor="middle" font-size="10" fill="#334155" transform="rotate(-90,${fx-26},${fy+(fh+wh)/2})">h = ${p.h} cm</text>
+
+<!-- hf label -->
+<line x1="${fx+fw+6}" y1="${fy}" x2="${fx+fw+6}" y2="${fy+fh}" stroke="#64748b" stroke-width="0.7" marker-end="url(#ar)" marker-start="url(#ar)"/>
+<text x="${fx+fw+10}" y="${fy+fh/2+3}" font-size="9" fill="#334155">hf=${p.hf} cm</text>
+
+<!-- Legend -->
+<rect x="${padX}" y="${wb+42}" width="12" height="10" fill="#93c5fd" stroke="#1e3a8a" stroke-width="0.8"/>
+<text x="${padX+15}" y="${wb+51}" font-size="10" fill="#334155">คอนกรีต</text>
+<rect x="${padX+70}" y="${wb+42}" width="12" height="10" fill="url(#hatch)"/>
+<text x="${padX+85}" y="${wb+51}" font-size="10" fill="#334155">โซนอัด (a)</text>
+<circle cx="${padX+155}" cy="${wb+47}" r="5" fill="#1d4ed8"/>
+<text x="${padX+163}" y="${wb+51}" font-size="10" fill="#334155">เหล็กหลัก</text>
+<line x1="${padX+215}" y1="${wb+47}" x2="${padX+227}" y2="${wb+47}" stroke="#dc2626" stroke-width="2"/>
+<text x="${padX+230}" y="${wb+51}" font-size="10" fill="#334155">ปลอก</text>
+${p.rtype==='doubly'&&p.Asp>0?`<circle cx="${padX+8}" cy="${wb+64}" r="5" fill="#dc2626"/><text x="${padX+16}" y="${wb+68}" font-size="10" fill="#334155">เหล็กรับแรงอัด As′</text>`:''}
+<line x1="${padX+130}" y1="${wb+64}" x2="${padX+142}" y2="${wb+64}" stroke="#7c3aed" stroke-width="1.5" stroke-dasharray="3 2"/>
+<text x="${padX+145}" y="${wb+68}" font-size="10" fill="#334155">เหล็กปีกตามขวาง</text>
+</svg>`;
+
+  document.getElementById('svg-area').innerHTML = svg;
+}
+
+/* ─── init ─── */
+setType('interior');
+run();
+document.querySelectorAll('input,select').forEach(el=>el.addEventListener('change',run));
+</script>
+</body>
+</html>
