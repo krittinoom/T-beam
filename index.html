@@ -236,38 +236,38 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--gray-500)}
   <div class="divider"></div>
   <h3>เหล็กเสริมที่ใช้จริง</h3>
   <div class="field">
-    <label>เหล็กรับแรงดึงล่าง (Bottom / Tension)</label>
+    <label>ขนาด &amp; จำนวนเหล็กรับแรงดึงล่าง (Bottom / Tension)</label>
     <div class="fr">
-      <select id="barDia">
-        <option value="1.2">DB12</option>
-        <option value="1.6">DB16</option>
-        <option value="2.0" selected>DB20</option>
-        <option value="2.5">DB25</option>
-        <option value="2.8">DB28</option>
-        <option value="3.2">DB32</option>
+      <select id="mainDia" style="flex:1.3">
+        <option value="1.0">DB10 — 1.0 cm</option>
+        <option value="1.2">DB12 — 1.2 cm</option>
+        <option value="1.6" selected>DB16 — 1.6 cm</option>
+        <option value="2.0">DB20 — 2.0 cm</option>
+        <option value="2.2">DB22 — 2.2 cm</option>
+        <option value="2.5">DB25 — 2.5 cm</option>
+        <option value="2.8">DB28 — 2.8 cm</option>
+        <option value="3.2">DB32 — 3.2 cm</option>
       </select>
-      <span style="font-size:12px;color:var(--gray-500);margin:0 4px">จำนวน</span>
-      <input type="number" id="barNum" value="4" min="1" step="1" style="flex:0.5">
+      <input type="number" id="mainQty" value="6" min="2" max="20" step="1" style="max-width:60px">
       <span class="unit">เส้น</span>
     </div>
-    <div class="hint" style="margin-top:4px">พื้นที่หน้าตัด As = <span id="as-disp" style="font-weight:700;color:var(--blue)">12.57</span> cm²</div>
+    <div class="note" id="As-note" style="margin-top:3px">As = <b>—</b> cm²</div>
   </div>
   <div class="field" id="fld-Asp" style="display:none">
-    <label>เหล็กรับแรงอัดบน (Top / Compression) <span class="hint">สำหรับ Doubly</span></label>
+    <label>ขนาด &amp; จำนวนเหล็กรับแรงอัดบน (Top / Compression) <span class="hint">สำหรับ Doubly</span></label>
     <div class="fr">
-      <select id="barDiaTop">
-        <option value="1.2">DB12</option>
-        <option value="1.6" selected>DB16</option>
-        <option value="2.0">DB20</option>
-        <option value="2.5">DB25</option>
-        <option value="2.8">DB28</option>
-        <option value="3.2">DB32</option>
+      <select id="topDia" style="flex:1.3">
+        <option value="1.0">DB10 — 1.0 cm</option>
+        <option value="1.2" selected>DB12 — 1.2 cm</option>
+        <option value="1.6">DB16 — 1.6 cm</option>
+        <option value="2.0">DB20 — 2.0 cm</option>
+        <option value="2.2">DB22 — 2.2 cm</option>
+        <option value="2.5">DB25 — 2.5 cm</option>
       </select>
-      <span style="font-size:12px;color:var(--gray-500);margin:0 4px">จำนวน</span>
-      <input type="number" id="barNumTop" value="2" min="0" step="1" style="flex:0.5">
+      <input type="number" id="topQty" value="3" min="0" max="20" step="1" style="max-width:60px">
       <span class="unit">เส้น</span>
     </div>
-    <div class="hint" style="margin-top:4px">พื้นที่หน้าตัด As′ = <span id="asp-disp" style="font-weight:700;color:var(--blue)">4.02</span> cm²</div>
+    <div class="note" id="Asp-note" style="margin-top:3px">As′ = <b>—</b> cm²</div>
   </div>
   <div class="field" id="fld-dp" style="display:none">
     <label>d′ ระยะจากผิวรับแรงอัดถึงศูนย์กลาง As′</label>
@@ -323,8 +323,9 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--gray-500)}
   <div class="divider"></div>
   <h3>ตรวจสอบน้ำหนักบรรทุกใช้งานจริง <span class="hint">(Applied Load Check)</span></h3>
   <div class="toggle-grp">
-    <div class="tog on" id="tg-wfac" onclick="setLoadMode('factored')">Wu ประลัยโดยตรง</div>
-    <div class="tog"    id="tg-wsvc" onclick="setLoadMode('service')">DL + LL (Service)</div>
+    <div class="tog on" id="tg-wfac" onclick="setLoadMode('factored')">Wu ตรง</div>
+    <div class="tog"    id="tg-wsvc" onclick="setLoadMode('service')">DL+LL</div>
+    <div class="tog"    id="tg-wvm"  onclick="setLoadMode('vm')">V, M ระบุจุด</div>
   </div>
   <div class="field" id="fld-Wu">
     <label>Wu — น้ำหนักบรรทุกประลัยที่ใช้งานจริง</label>
@@ -339,6 +340,18 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--gray-500)}
     <label>LL — น้ำหนักบรรทุกจร (Live Load, ใช้งาน)</label>
     <div class="fr"><input type="number" id="LL" value="0" min="0" step="0.01"><span class="unit">ตัน/ม.</span></div>
     <div class="note" style="margin-top:4px">Wu = 1.2×DL + 1.6×LL <span style="color:var(--gray-500)">(ACI 318-19 ข้อ 5.3.1)</span></div>
+  </div>
+  <div class="field" id="fld-VM" style="display:none">
+    <div class="note" style="margin-bottom:8px">ระบุค่าแรงเฉือน (V) และโมเมนต์ดัด (M) แบบประลัย จากผลวิเคราะห์โครงสร้างจริง — ใส่เครื่องหมาย + หรือ − ได้ตาม sign convention ของโปรแกรมที่ใช้</div>
+    <label style="display:block;font-weight:700;font-size:11px;color:var(--gray-700);margin-bottom:3px">จุดเริ่มต้น (x = 0)</label>
+    <div class="fr"><input type="number" id="V0" value="0" step="0.01"><span class="unit">V ตัน</span>
+      <input type="number" id="M0" value="0" step="0.01"><span class="unit">M ตัน·ม.</span></div>
+    <label style="display:block;font-weight:700;font-size:11px;color:var(--gray-700);margin:8px 0 3px">กึ่งกลางคาน (x = L/2)</label>
+    <div class="fr"><input type="number" id="Vm" value="0" step="0.01"><span class="unit">V ตัน</span>
+      <input type="number" id="Mm" value="0" step="0.01"><span class="unit">M ตัน·ม.</span></div>
+    <label style="display:block;font-weight:700;font-size:11px;color:var(--gray-700);margin:8px 0 3px">ปลายคาน (x = L)</label>
+    <div class="fr"><input type="number" id="VL" value="0" step="0.01"><span class="unit">V ตัน</span>
+      <input type="number" id="ML" value="0" step="0.01"><span class="unit">M ตัน·ม.</span></div>
   </div>
 
   <button class="run" onclick="run()">▶ ตรวจสอบและคำนวณกำลังรับน้ำหนัก</button>
@@ -387,6 +400,11 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--gray-500)}
   <div class="card">
     <h2>📈 แผนภาพแรงเฉือน &amp; โมเมนต์ดัดตลอดความยาวคาน (SFD / BMD)</h2>
     <div id="diagram-result"></div>
+  </div>
+
+  <div class="card">
+    <h2>📝 รายการคำนวณโดยละเอียด (Detailed Calculation Steps)</h2>
+    <div id="detailed-calc"></div>
   </div>
 
   <div class="card">
@@ -500,9 +518,11 @@ function setLoadMode(m){
   loadMode = m;
   document.getElementById('tg-wfac').classList.toggle('on', m==='factored');
   document.getElementById('tg-wsvc').classList.toggle('on', m==='service');
+  document.getElementById('tg-wvm').classList.toggle('on', m==='vm');
   document.getElementById('fld-Wu').style.display = m==='factored'?'block':'none';
   document.getElementById('fld-DL').style.display = m==='service'?'block':'none';
   document.getElementById('fld-LL').style.display = m==='service'?'block':'none';
+  document.getElementById('fld-VM').style.display = m==='vm'?'block':'none';
   run();
 }
 function fillCapacity(){
@@ -585,29 +605,35 @@ function govCard(name, formula, note, ref){
   </div>`;
 }
 
+function stepBlock(n, title, body){
+  return `<div class="chk info" style="border-left-color:#334155">
+    <div class="ch"><span class="nm">ขั้นตอนที่ ${n} — ${title}</span></div>
+    <div class="formula">${body}</div>
+  </div>`;
+}
+
 /* ─── MAIN ─── */
 function run(){
   const L   = gv('L'),   s    = gv('s'),   s_e  = gv('s_e');
   const bw  = gv('bw'),  h    = gv('h'),   d    = gv('d'),   hf   = gv('hf');
   const fc  = gv('fc'),  fy   = gv('fy'),  fyt  = gv('fyt');
-  
-  const barDia = parseFloat(document.getElementById('barDia').value);
-  const barNum = gi('barNum');
-  const As = (Math.PI * Math.pow(barDia, 2) / 4) * barNum;
-  document.getElementById('as-disp').textContent = As.toFixed(2);
-  
-  const sv   = gv('sv'),  cover= gv('cover');
+  const sv  = gv('sv'),  cover= gv('cover');
   const stirDia  = parseFloat(document.getElementById('stirDia').value);
   const stirLegs = parseInt(document.getElementById('stirLegs').value);
-  
-  const barDiaTop = parseFloat(document.getElementById('barDiaTop').value);
-  const barNumTop = gi('barNumTop');
-  let Asp = 0;
-  if(rtype === 'doubly') {
-    Asp = (Math.PI * Math.pow(barDiaTop, 2) / 4) * barNumTop;
-    document.getElementById('asp-disp').textContent = Asp.toFixed(2);
-  }
-  
+
+  // Main tension steel — from bar size × quantity
+  const mainDia = parseFloat(document.getElementById('mainDia').value);
+  const mainQty = gi('mainQty');
+  const As = mainQty * Math.PI*mainDia*mainDia/4;
+  document.getElementById('As-note').innerHTML = `As = <b>${fmt(As,2)} cm²</b> (${mainQty}-DB${Math.round(mainDia*10)})`;
+
+  // Top compression steel — from bar size × quantity (Doubly only)
+  const topDia = parseFloat(document.getElementById('topDia').value);
+  const topQty = rtype==='doubly' ? gi('topQty') : 0;
+  const Asp = rtype==='doubly' ? topQty*Math.PI*topDia*topDia/4 : 0;
+  document.getElementById('Asp-note').innerHTML = rtype==='doubly'
+    ? `As′ = <b>${fmt(Asp,2)} cm²</b> (${topQty}-DB${Math.round(topDia*10)})`
+    : '';
   const dp  = rtype==='doubly' ? gv('dp')  : 0;
   const flDia = parseFloat(document.getElementById('flDia').value);
   const flSpacing = gv('flSpacing');
@@ -800,44 +826,79 @@ function run(){
   const Ws_ton     = Wu_ton_gov/1.5; // approx service
   lastWuGov = Wu_ton_gov; // stash for the "fillCapacity" helper button
 
-  // Applied load check — user-specified Wu (factored) or DL+LL (service, auto-factored)
+  // Applied load check — Wu (factored), DL+LL (service, auto-factored), or direct V/M at 3 stations
   const DLval = loadMode==='service' ? gv('DL') : 0;
   const LLval = loadMode==='service' ? gv('LL') : 0;
-  const Wu_applied_ton = loadMode==='service' ? (1.2*DLval + 1.6*LLval) : gv('WuInput');
-  const Wu_applied_kgf = Wu_applied_ton*1000;
-  const Vu_applied = Wu_applied_kgf*Lm/2;      // kgf
-  const Mu_applied = Wu_applied_kgf*Lm*Lm/8;   // kgf·m
-  const DCR_V = phiVn>0 ? Vu_applied/phiVn : 0;
-  const DCR_M = phiMn>0 ? Mu_applied/phiMn : 0;
+  let Wu_applied_ton = 0, Wu_applied_kgf = 0, Vu_applied = 0, Mu_applied = 0, DCR_V = 0, DCR_M = 0;
+  let vmStations = null; // {x:[...], V:[...kgf], M:[...kgf·m]} for VM mode, else null
+  const hasLoad = (loadMode==='vm')
+    ? (gv('V0')!==0 || gv('M0')!==0 || gv('Vm')!==0 || gv('Mm')!==0 || gv('VL')!==0 || gv('ML')!==0)
+    : (loadMode==='service' ? (1.2*DLval+1.6*LLval)>0 : gv('WuInput')>0);
+
+  if(loadMode==='vm'){
+    const V0=gv('V0')*1000, Vm=gv('Vm')*1000, VL=gv('VL')*1000;     // kgf
+    const M0=gv('M0')*1000, Mm=gv('Mm')*1000, ML=gv('ML')*1000;     // kgf·m
+    vmStations = { x:[0,Lm/2,Lm], V:[V0,Vm,VL], M:[M0,Mm,ML] };
+    Vu_applied = Math.max(Math.abs(V0),Math.abs(Vm),Math.abs(VL));
+    Mu_applied = Math.max(Math.abs(M0),Math.abs(Mm),Math.abs(ML));
+  } else {
+    Wu_applied_ton = loadMode==='service' ? (1.2*DLval + 1.6*LLval) : gv('WuInput');
+    Wu_applied_kgf = Wu_applied_ton*1000;
+    Vu_applied = Wu_applied_kgf*Lm/2;
+    Mu_applied = Wu_applied_kgf*Lm*Lm/8;
+  }
+  DCR_V = phiVn>0 ? Vu_applied/phiVn : 0;
+  DCR_M = phiMn>0 ? Mu_applied/phiMn : 0;
 
   let alHtml = '';
-  if(Wu_applied_ton<=0){
+  if(!hasLoad){
     alHtml = `<div class="banner info"><div class="ico">ℹ️</div><div>
       <strong>ยังไม่ได้ระบุน้ำหนักบรรทุก</strong>
-      <span>กรอกค่า Wu หรือ DL/LL ทางซ้ายมือ เพื่อตรวจสอบว่าคานหน้าตัดนี้รับน้ำหนักได้หรือไม่ (กำลังสูงสุดที่คานรับได้ปัจจุบัน Wu,allow = ${fmt(Wu_ton_gov,3)} ตัน/ม.)</span>
+      <span>กรอกค่า Wu, DL/LL หรือ V/M ทางซ้ายมือ เพื่อตรวจสอบว่าคานหน้าตัดนี้รับน้ำหนักได้หรือไม่ (กำลังสูงสุดที่คานรับได้ปัจจุบัน Wu,allow = ${fmt(Wu_ton_gov,3)} ตัน/ม.)</span>
     </div></div>`;
   } else {
     const passAll = DCR_M<=1 && DCR_V<=1;
     const worseDCR = Math.max(DCR_M,DCR_V);
+    const loadDesc = loadMode==='vm'
+      ? `|V|max=${fmt(Vu_applied/1000,3)} ตัน, |M|max=${fmt(Mu_applied/1000,3)} ตัน·ม. (จากค่า V,M ที่ระบุ 3 ตำแหน่ง)`
+      : `Wu ที่ตรวจสอบ = ${fmt(Wu_applied_ton,3)} ตัน/ม.${loadMode==='service'?` (จาก 1.2×${fmt(DLval,2)} + 1.6×${fmt(LLval,2)})`:''}`;
     alHtml = `<div class="banner ${passAll?'pass':'fail'}">
       <div class="ico">${passAll?'✅':'❌'}</div>
       <div>
         <strong>${passAll?'คานรับน้ำหนักที่ระบุได้ (ปลอดภัย)':'คานรับน้ำหนักที่ระบุไม่ได้ — เกินกำลัง!'}</strong>
-        <span>Wu ที่ตรวจสอบ = ${fmt(Wu_applied_ton,3)} ตัน/ม.${loadMode==='service'?` (จาก 1.2×${fmt(DLval,2)} + 1.6×${fmt(LLval,2)})`:''} | Wu,allow = ${fmt(Wu_ton_gov,3)} ตัน/ม. | DCR สูงสุด = ${worseDCR.toFixed(2)} (${DCR_M>=DCR_V?'โมเมนต์':'แรงเฉือน'}ควบคุม)</span>
+        <span>${loadDesc} | Wu,allow = ${fmt(Wu_ton_gov,3)} ตัน/ม. | DCR สูงสุด = ${worseDCR.toFixed(2)} (${DCR_M>=DCR_V?'โมเมนต์':'แรงเฉือน'}ควบคุม)</span>
       </div>
     </div>`;
-    alHtml += chkCard(DCR_M<=1?'pass':'fail',
-      'ตรวจสอบโมเมนต์ดัด (Flexure Check)',
-      `Mu = Wu×L²/8 = ${fmt(Wu_applied_kgf,0)}×${fmt(Lm,2)}²/8 = <b>${fmt(Mu_applied,0)} kgf·m</b> (${fmt(Mu_applied/1000,3)} ตัน·ม.)<br>
-       φMn = <b>${fmt(phiMn,0)} kgf·m</b> → DCR = Mu/φMn = <b>${DCR_M.toFixed(3)}</b> ${DCR_M<=1?'≤ 1.0 ✓ OK':'> 1.0 ✗ เกินกำลัง'}`,
-      null, null
-    );
-    alHtml += chkCard(DCR_V<=1?'pass':'fail',
-      'ตรวจสอบแรงเฉือน (Shear Check)',
-      `Vu = Wu×L/2 = ${fmt(Wu_applied_kgf,0)}×${fmt(Lm,2)}/2 = <b>${fmt(Vu_applied,0)} kgf</b> (${fmt(Vu_applied/1000,3)} ตัน)<br>
-       φVn = <b>${fmt(phiVn,0)} kgf</b> → DCR = Vu/φVn = <b>${DCR_V.toFixed(3)}</b> ${DCR_V<=1?'≤ 1.0 ✓ OK':'> 1.0 ✗ เกินกำลัง'}`,
-      null, null
-    );
+
+    if(loadMode==='vm'){
+      const rows = [
+        ['เริ่มต้น (x=0)', vmStations.V[0], vmStations.M[0]],
+        ['กึ่งกลาง (x=L/2)', vmStations.V[1], vmStations.M[1]],
+        ['ปลายคาน (x=L)', vmStations.V[2], vmStations.M[2]],
+      ];
+      let rowsHtml = rows.map(([lbl,Vk,Mk])=>{
+        const dv = phiVn>0?Math.abs(Vk)/phiVn:0, dm = phiMn>0?Math.abs(Mk)/phiMn:0;
+        const ok = dv<=1 && dm<=1;
+        return `<tr><td>${lbl}</td><td>${fmt(Vk/1000,3)}</td><td>${dv.toFixed(2)}</td><td>${fmt(Mk/1000,3)}</td><td>${dm.toFixed(2)}</td>
+          <td>${ok?'<span class="bdg pass">OK ✓</span>':'<span class="bdg fail">FAIL ✗</span>'}</td></tr>`;
+      }).join('');
+      alHtml += `<table class="vtab"><thead><tr><th>ตำแหน่ง</th><th>V (ตัน)</th><th>DCR_V</th><th>M (ตัน·ม.)</th><th>DCR_M</th><th>ผล</th></tr></thead>
+        <tbody>${rowsHtml}</tbody></table>
+        <div class="note" style="margin-top:6px">φVn = ${fmt(phiVn,0)} kgf (${fmt(phiVn/1000,3)} ตัน), φMn = ${fmt(phiMn,0)} kgf·m (${fmt(phiMn/1000,3)} ตัน·ม.) — ใช้เป็นกำลังรับเปรียบเทียบทุกตำแหน่ง (สมมติหน้าตัดเดียวกันตลอดความยาวคาน)</div>`;
+    } else {
+      alHtml += chkCard(DCR_M<=1?'pass':'fail',
+        'ตรวจสอบโมเมนต์ดัด (Flexure Check)',
+        `Mu = Wu×L²/8 = ${fmt(Wu_applied_kgf,0)}×${fmt(Lm,2)}²/8 = <b>${fmt(Mu_applied,0)} kgf·m</b> (${fmt(Mu_applied/1000,3)} ตัน·ม.)<br>
+         φMn = <b>${fmt(phiMn,0)} kgf·m</b> → DCR = Mu/φMn = <b>${DCR_M.toFixed(3)}</b> ${DCR_M<=1?'≤ 1.0 ✓ OK':'> 1.0 ✗ เกินกำลัง'}`,
+        null, null
+      );
+      alHtml += chkCard(DCR_V<=1?'pass':'fail',
+        'ตรวจสอบแรงเฉือน (Shear Check)',
+        `Vu = Wu×L/2 = ${fmt(Wu_applied_kgf,0)}×${fmt(Lm,2)}/2 = <b>${fmt(Vu_applied,0)} kgf</b> (${fmt(Vu_applied/1000,3)} ตัน)<br>
+         φVn = <b>${fmt(phiVn,0)} kgf</b> → DCR = Vu/φVn = <b>${DCR_V.toFixed(3)}</b> ${DCR_V<=1?'≤ 1.0 ✓ OK':'> 1.0 ✗ เกินกำลัง'}`,
+        null, null
+      );
+    }
   }
   document.getElementById('applied-load-result').innerHTML = alHtml;
 
@@ -904,10 +965,90 @@ function run(){
   document.getElementById('load-result').innerHTML = lhtml;
 
   /* ── SVG ── */
-  drawSVG({bw,h,hf,bf,d,cover,stirDia,stirLegs,a_mn,As,Asp,dp,rtype, barNum, barNumTop, barDia, barDiaTop});
+  drawSVG({bw,h,hf,bf,d,cover,stirDia,stirLegs,a_mn,As,Asp,dp,rtype,mainDia,mainQty,topDia,topQty});
 
   /* ── SFD / BMD ── */
-  drawDiagrams(Lm, Wu_applied_kgf, phiMn, phiVn);
+  if(loadMode==='vm'){
+    drawDiagramsVM(vmStations, phiMn, phiVn);
+  } else {
+    drawDiagrams(Lm, Wu_applied_kgf, phiMn, phiVn);
+  }
+
+  /* ═════════════════════════════════════════
+     DETAILED STEP-BY-STEP CALCULATION REPORT
+  ═════════════════════════════════════════ */
+  let dhtml = '';
+  dhtml += stepBlock(1, 'ข้อมูลนำเข้า (Given Data)',
+    `ประเภทคาน: ${btype==='interior'?'คานกลาง (Interior)':'คานริม (Edge/Spandrel)'} &nbsp;|&nbsp; รูปแบบเสริมเหล็ก: ${rtype==='doubly'?'Doubly Reinforced':'Singly Reinforced'}<br>
+     L = ${L} cm, s = ${s} cm${btype==='edge'?`, s_e = ${s_e} cm`:''}<br>
+     bw = ${bw} cm, h = ${h} cm, d = ${d} cm, hf = ${hf} cm, cover = ${cover} cm<br>
+     f'c = ${fc} ksc, fy = ${fy} ksc, fyt = ${fyt} ksc<br>
+     เหล็กรับแรงดึงล่าง: ${mainQty}-DB${Math.round(mainDia*10)} (As = ${fmt(As,2)} cm²)${rtype==='doubly'?`<br>เหล็กรับแรงอัดบน: ${topQty}-DB${Math.round(topDia*10)} (As′ = ${fmt(Asp,2)} cm², d′ = ${dp} cm)`:''}<br>
+     เหล็กปลอก: ${stirLegs} ขา RB${Math.round(stirDia*10)} @ ${sv} cm &nbsp;|&nbsp; เหล็กปีกตามขวาง: RB${Math.round(flDia*10)} @ ${flSpacing} cm`
+  );
+  dhtml += stepBlock(2, 'ปัจจัยรูปทรงบล็อกความเค้นอัด β₁',
+    `f'c = ${fc} ksc ${fc<=280?'≤':'>'} 280 ksc → β₁ = ${fc<=280?'0.85':'0.85 − 0.05×(f\'c−280)/70 = '+fmt(beta1,3)}`
+  );
+  dhtml += stepBlock(3, 'ความกว้างปีกประสิทธิผล bf',
+    cands.map((c,i)=>`${c.lbl}: ${c.f}${i===minIdx?' ← <b>governs</b>':''}`).join('<br>') +
+    `<br><b>bf ที่ใช้ออกแบบ = ${fmt(bf,1)} cm</b>`
+  );
+  dhtml += stepBlock(4, 'พื้นที่เหล็กเสริมจากขนาด/จำนวนที่เลือก',
+    `As = n×π×db²/4 = ${mainQty}×π×${mainDia}²/4 = <b>${fmt(As,2)} cm²</b>` +
+    (rtype==='doubly' ? `<br>As′ = n×π×db²/4 = ${topQty}×π×${topDia}²/4 = <b>${fmt(Asp,2)} cm²</b>` : '')
+  );
+  dhtml += stepBlock(5, 'ตรวจสอบเหล็กเสริมขั้นต่ำ As,min',
+    `As,min = max(0.25√f'c/fy·bw·d, 14/fy·bw·d) = max(${fmt(Asmin_a,3)}, ${fmt(Asmin_b,3)}) = <b>${fmt(Asmin,3)} cm²</b><br>
+     As ใช้จริง = ${fmt(As,2)} cm² ${minOK?'≥':'<'} As,min → ${minOK?'✓ OK':'✗ ไม่พอ'}`
+  );
+  dhtml += stepBlock(6, 'ตำแหน่งแกนสะเทิน a, c และความเครียด ε_t',
+    `${flex.caseLabel==='A'?'NA อยู่ในปีก (Case A, ใช้ b=bf)':'NA อยู่ในคอคาน (Case B, ใช้ b=bw + ปีกยื่น)'}<br>
+     a = ${fmt(a_na,2)} cm, c = a/β₁ = <b>${fmt(c_na,2)} cm</b><br>
+     ε_t = 0.003×(d−c)/c = <b>${et.toFixed(4)}</b> ${ductOK?'≥':'<'} 0.004 → ${ductOK?'✓ ผ่าน':'✗ ไม่ผ่าน'}` +
+    (Asp>0 ? `<br>fs′ ในเหล็กรับแรงอัด = ${fmt(flex.fsp,0)} ksc (${flex.yields?'ครากแล้ว':'ยังไม่คราก'})` : '')
+  );
+  dhtml += stepBlock(7, 'ตัวคูณลดกำลังด้านโมเมนต์ φ',
+    `ε_t = ${et.toFixed(4)} → φ = ${et>=0.005?'0.90 (tension-controlled)':et>=0.004?fmt(phi_f,3)+' (transition zone)':'0.65 (compression-controlled)'}`
+  );
+  dhtml += stepBlock(8, 'กำลังรับโมเมนต์ดัด Mn และ φMn',
+    `${caseTxt}<br>Mn = <b>${fmt(Mn,1)} kgf·m</b><br>φMn = φ×Mn = ${fmt(phi_f,3)}×${fmt(Mn,1)} = <b>${fmt(phiMn,1)} kgf·m</b>`
+  );
+  dhtml += stepBlock(9, 'กำลังรับแรงเฉือน Vc, Vs และ φVn',
+    `Vc = 0.53√f'c·bw·d = <b>${fmt(Vc_kgf,1)} kgf</b><br>
+     Av = ${stirLegs}×π×${stirDia}²/4 = ${fmt(Av,4)} cm², Vs = Av·fyt·d/sv = <b>${fmt(Vs_kgf,1)} kgf</b><br>
+     φVn = 0.75×(Vc+Vs) = <b>${fmt(phiVn,1)} kgf</b>`
+  );
+  dhtml += stepBlock(10, 'ตรวจสอบระยะห่างเหล็กปลอก s_max',
+    `s_max = ${Vs_kgf<=Vs_lim?'min(d/2,60)':'min(d/4,30)'} = <b>${fmt(smax,1)} cm</b>, ใช้จริง sv = ${sv} cm → ${spacOK?'✓ OK':'✗ ต้องลดระยะห่าง'}`
+  );
+  dhtml += stepBlock(11, 'ตรวจสอบเหล็กปีกตามขวาง',
+    `As,f จัดวางจริง = <b>${fmt(As_fl_prov,3)} cm²/m</b> เทียบ As,f,min = ${fmt(As_fl_min,3)} cm²/m → ${flAreaOK?'✓ OK':'✗ ไม่พอ'}<br>
+     s_f = ${flSpacing} cm เทียบ s_max = ${fmt(fl_smax,1)} cm → ${flSpacOK?'✓ OK':'✗ ห่างเกินไป'}`
+  );
+  dhtml += stepBlock(12, 'น้ำหนักบรรทุกสูงสุดที่คานรับได้ Wu,allow',
+    `จากโมเมนต์: Wu,M = 8φMn/L² = <b>${fmt(Wu_ton_M,4)} ตัน/ม.</b><br>
+     จากแรงเฉือน: Wu,V = 2φVn/L = <b>${fmt(Wu_ton_V,4)} ตัน/ม.</b><br>
+     Wu,allow = min(Wu,M, Wu,V) = <b>${fmt(Wu_ton_gov,4)} ตัน/ม.</b> (ควบคุมโดย ${govBy})`
+  );
+  dhtml += stepBlock(13, 'ตรวจสอบน้ำหนักบรรทุกที่ระบุ (Applied Load Check)',
+    !hasLoad ? 'ยังไม่ได้ระบุน้ำหนักบรรทุกเพื่อตรวจสอบ' :
+    (loadMode==='vm'
+      ? `โหมด: ระบุ V, M ที่ 3 ตำแหน่ง<br>
+         x=0: V=${fmt(vmStations.V[0]/1000,3)} ตัน, M=${fmt(vmStations.M[0]/1000,3)} ตัน·ม.<br>
+         x=L/2: V=${fmt(vmStations.V[1]/1000,3)} ตัน, M=${fmt(vmStations.M[1]/1000,3)} ตัน·ม.<br>
+         x=L: V=${fmt(vmStations.V[2]/1000,3)} ตัน, M=${fmt(vmStations.M[2]/1000,3)} ตัน·ม.<br>
+         |V|max=${fmt(Vu_applied,0)} kgf → DCR_V=${DCR_V.toFixed(3)}, |M|max=${fmt(Mu_applied,0)} kgf·m → DCR_M=${DCR_M.toFixed(3)}<br>
+         <b>${(DCR_V<=1&&DCR_M<=1)?'✓ ผ่าน — คานรับน้ำหนักที่ระบุได้':'✗ ไม่ผ่าน — เกินกำลัง'}</b>`
+      : `โหมด: ${loadMode==='service'?'DL+LL (Service)':'Wu ประลัยโดยตรง'}${loadMode==='service'?` — Wu=1.2×${fmt(DLval,2)}+1.6×${fmt(LLval,2)}=${fmt(Wu_applied_ton,3)} ตัน/ม.`:` — Wu=${fmt(Wu_applied_ton,3)} ตัน/ม.`}<br>
+         Mu = Wu·L²/8 = ${fmt(Mu_applied,0)} kgf·m → DCR_M = ${DCR_M.toFixed(3)}<br>
+         Vu = Wu·L/2 = ${fmt(Vu_applied,0)} kgf → DCR_V = ${DCR_V.toFixed(3)}<br>
+         <b>${(DCR_V<=1&&DCR_M<=1)?'✓ ผ่าน — คานรับน้ำหนักที่ระบุได้':'✗ ไม่ผ่าน — เกินกำลัง'}</b>`)
+  );
+  dhtml += stepBlock(14, 'สรุปผลรวม',
+    `เกณฑ์ทั้งหมด (As,min / ε_t / s_max / cover / เหล็กปีกตามขวาง) → ${allOK?'✓ ผ่านทั้งหมด':'✗ มีข้อไม่ผ่าน โปรดดูรายละเอียดด้านบน'}<br>
+     bf = ${fmt(bf,1)} cm, φMn = ${fmt(phiMn,0)} kgf·m, φVn = ${fmt(phiVn,0)} kgf, Wu,allow = ${fmt(Wu_ton_gov,3)} ตัน/ม.`
+  );
+  document.getElementById('detailed-calc').innerHTML = dhtml;
 }
 
 /* ─── SFD / BMD DIAGRAM DRAWING ─── */
@@ -994,6 +1135,78 @@ function drawDiagrams(Lm, Wu, phiMn, phiVn){
   document.getElementById('diagram-result').innerHTML = html;
 }
 
+/* ─── SFD / BMD from 3 user-specified stations (start, mid, end) — straight-line interpolation ─── */
+function drawDiagramsVM(st, phiMn, phiVn){
+  const Lm = st.x[2];
+  const Vabs = st.V.map(v=>Math.abs(v));
+  const Mabs = st.M.map(m=>Math.abs(m));
+  const Vmax = Math.max(...Vabs);
+  const Mmax = Math.max(...Mabs);
+  const DCR_V = phiVn>0 ? Vmax/phiVn : 0;
+  const DCR_M = phiMn>0 ? Mmax/phiMn : 0;
+
+  const W=680, H=210, padL=64, padR=34, padT=26, padB=30;
+  const plotW = W-padL-padR, plotH = H-padT-padB;
+  const xScale = Lm>0 ? plotW/Lm : 0;
+
+  /* ---- Shear (3-point polyline) ---- */
+  const vAbsMax = Math.max(Vmax, phiVn, 1)*1.15;
+  const vMidY = padT+plotH/2;
+  const vScale = (plotH/2)/vAbsMax;
+  const vColor = DCR_V>1 ? '#e02424' : '#1a56db';
+  const vPts = st.x.map((x,i)=>`${(padL+x*xScale).toFixed(1)},${(vMidY - st.V[i]*vScale).toFixed(1)}`);
+  const vCapTopY = vMidY - phiVn*vScale, vCapBotY = vMidY + phiVn*vScale;
+
+  const shearSVG = `<svg width="100%" viewBox="0 0 ${W} ${H}" style="max-width:660px">
+    <line x1="${padL}" y1="${vMidY}" x2="${padL+plotW}" y2="${vMidY}" stroke="#94a3b8" stroke-width="1"/>
+    <line x1="${padL}" y1="${vCapTopY}" x2="${padL+plotW}" y2="${vCapTopY}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="5 3"/>
+    <line x1="${padL}" y1="${vCapBotY}" x2="${padL+plotW}" y2="${vCapBotY}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="5 3"/>
+    <polyline points="${vPts.join(' ')}" fill="none" stroke="${vColor}" stroke-width="2.2"/>
+    ${st.x.map((x,i)=>`<circle cx="${(padL+x*xScale).toFixed(1)}" cy="${(vMidY-st.V[i]*vScale).toFixed(1)}" r="3.2" fill="${vColor}"/>`).join('')}
+    ${st.x.map((x,i)=>`<text x="${(padL+x*xScale).toFixed(1)}" y="${(vMidY-st.V[i]*vScale-6).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="${vColor}">${fmt(st.V[i]/1000,2)}</text>`).join('')}
+    <text x="${padL+plotW+4}" y="${vCapTopY+3}" font-size="9" fill="#b45309">φVn</text>
+    <text x="${padL}" y="${H-8}" font-size="10" fill="#64748b">0</text>
+    <text x="${padL+plotW/2}" y="${H-8}" text-anchor="middle" font-size="10" fill="#64748b">L/2</text>
+    <text x="${padL+plotW}" y="${H-8}" text-anchor="end" font-size="10" fill="#64748b">L=${fmt(Lm,2)} m</text>
+  </svg>`;
+
+  /* ---- Moment (3-point polyline) ---- */
+  const mAbsMax = Math.max(Mmax, phiMn, 1)*1.15;
+  const mScale = plotH/mAbsMax;
+  const mColor = DCR_M>1 ? '#e02424' : '#057a55';
+  const mCapY = padT + phiMn*mScale;
+  const mPts = st.x.map((x,i)=>`${(padL+x*xScale).toFixed(1)},${(padT+st.M[i]*mScale).toFixed(1)}`);
+
+  const momentSVG = `<svg width="100%" viewBox="0 0 ${W} ${H}" style="max-width:660px">
+    <line x1="${padL}" y1="${padT}" x2="${padL+plotW}" y2="${padT}" stroke="#94a3b8" stroke-width="1"/>
+    <line x1="${padL}" y1="${mCapY}" x2="${padL+plotW}" y2="${mCapY}" stroke="#f59e0b" stroke-width="1" stroke-dasharray="5 3"/>
+    <polyline points="${mPts.join(' ')}" fill="none" stroke="${mColor}" stroke-width="2.2"/>
+    ${st.x.map((x,i)=>`<circle cx="${(padL+x*xScale).toFixed(1)}" cy="${(padT+st.M[i]*mScale).toFixed(1)}" r="3.2" fill="${mColor}"/>`).join('')}
+    ${st.x.map((x,i)=>`<text x="${(padL+x*xScale).toFixed(1)}" y="${(padT+st.M[i]*mScale+15).toFixed(1)}" text-anchor="middle" font-size="10" font-weight="700" fill="${mColor}">${fmt(st.M[i]/1000,2)}</text>`).join('')}
+    <text x="${padL+plotW+4}" y="${mCapY+3}" font-size="9" fill="#b45309">φMn</text>
+    <text x="${padL}" y="${H-8}" font-size="10" fill="#64748b">0</text>
+    <text x="${padL+plotW/2}" y="${H-8}" text-anchor="middle" font-size="10" fill="#64748b">L/2</text>
+    <text x="${padL+plotW}" y="${H-8}" text-anchor="end" font-size="10" fill="#64748b">L=${fmt(Lm,2)} m</text>
+  </svg>`;
+
+  const dcrBadge = (dcr)=> dcr<=1
+    ? `<span class="bdg pass">DCR = ${dcr.toFixed(2)} ✓</span>`
+    : `<span class="bdg fail">DCR = ${dcr.toFixed(2)} ✗</span>`;
+
+  let html = `<div class="notebox">📐 กราฟนี้ลากเส้นตรงเชื่อม 3 จุดที่ระบุ (เริ่มต้น–กึ่งกลาง–ปลายคาน) เป็นการประมาณจากข้อมูลจริงที่ป้อน ไม่ใช่รูปทรงจากสมการคาน UDL — เส้นประสีส้มคือกำลังรับที่ออกแบบได้ (φVn / φMn)</div>`;
+  html += `<div class="chk ${DCR_V<=1?'ok':'bad'}">
+    <div class="ch"><span class="nm">แผนภาพแรงเฉือน (Shear Force Diagram)</span>${dcrBadge(DCR_V)}</div>
+    <div class="svg-wrap" style="background:#fff;padding:6px">${shearSVG}</div>
+    <div class="formula">|V|max = <b>${fmt(Vmax,0)} kgf</b> (${fmt(Vmax/1000,3)} ตัน) &nbsp;|&nbsp; φVn = <b>${fmt(phiVn,0)} kgf</b></div>
+  </div>`;
+  html += `<div class="chk ${DCR_M<=1?'ok':'bad'}">
+    <div class="ch"><span class="nm">แผนภาพโมเมนต์ดัด (Bending Moment Diagram)</span>${dcrBadge(DCR_M)}</div>
+    <div class="svg-wrap" style="background:#fff;padding:6px">${momentSVG}</div>
+    <div class="formula">|M|max = <b>${fmt(Mmax,0)} kgf·m</b> (${fmt(Mmax/1000,3)} ตัน·ม.) &nbsp;|&nbsp; φMn = <b>${fmt(phiMn,0)} kgf·m</b></div>
+  </div>`;
+  document.getElementById('diagram-result').innerHTML = html;
+}
+
 /* ─── SVG SECTION DRAWING ─── */
 function drawSVG(p){
   const W=460, H=320, padX=50, padT=50, padB=80;
@@ -1012,32 +1225,42 @@ function drawSVG(p){
   const azInFlange = Math.min(p.a_mn*sc, fh);
   const azInWeb    = Math.max(0, p.a_mn*sc-fh);
 
-  // use actual bar count and sizes if provided
-  const barR = p.barDia ? (p.barDia/2)*sc : Math.max(3, Math.min(7, sc*0.45));
+  // Bottom (tension) bars — actual size & quantity, wraps to 2 rows if crowded
+  const mainR = Math.max(2.2, Math.min(8, p.mainDia*sc*0.5));
   const stR  = Math.max(1.5, sc*p.stirDia*0.4);
-  const nBars = p.barNum || Math.max(2, Math.round(p.As / (Math.PI*(0.9*0.9)/4)));
-  const barY  = wb - p.cover*sc - stR - barR;
-  const barSpan = Math.max(0, ww - 2*(p.cover*sc+stR) - 2*barR);
-  const barStep = nBars>1 ? barSpan/(nBars-1) : 0;
-
+  const nBars = Math.max(1, p.mainQty);
+  const barSpan = ww - 2*(p.cover*sc+stR+mainR);
+  function layoutRow(n, span){
+    if(n<=1) return [span/2];
+    const step = span/(n-1);
+    return Array.from({length:n},(_,i)=>i*step);
+  }
+  const maxPerRow = Math.max(2, Math.floor(barSpan/(mainR*2.4))+1);
   let bars='';
-  for(let i=0;i<nBars;i++){
-    const bx = wx + p.cover*sc + stR + barR + (nBars===1?barSpan/2:i*barStep);
-    bars+=`<circle cx="${bx}" cy="${barY}" r="${barR}" fill="#1d4ed8" stroke="#1e3a8a" stroke-width="0.6"/>`;
+  if(nBars<=maxPerRow){
+    const barY = wb - p.cover*sc - stR - mainR - 1;
+    layoutRow(nBars, barSpan).forEach(off=>{
+      bars+=`<circle cx="${wx+p.cover*sc+stR+mainR+off}" cy="${barY}" r="${mainR}" fill="#1d4ed8" stroke="#1e3a8a" stroke-width="0.6"/>`;
+    });
+  } else {
+    const nRow1 = Math.ceil(nBars/2), nRow2 = nBars-nRow1;
+    const rowGap = mainR*2.4;
+    const barY1 = wb - p.cover*sc - stR - mainR - 1;
+    const barY2 = barY1 - rowGap;
+    layoutRow(nRow1, barSpan).forEach(off=>{ bars+=`<circle cx="${wx+p.cover*sc+stR+mainR+off}" cy="${barY1}" r="${mainR}" fill="#1d4ed8" stroke="#1e3a8a" stroke-width="0.6"/>`; });
+    layoutRow(nRow2, barSpan).forEach(off=>{ bars+=`<circle cx="${wx+p.cover*sc+stR+mainR+off}" cy="${barY2}" r="${mainR}" fill="#1d4ed8" stroke="#1e3a8a" stroke-width="0.6"/>`; });
   }
 
-  // Top compression steel (Doubly reinforced)
+  // Top compression steel (Doubly reinforced) — actual size & quantity
   let topBars='';
-  if(p.rtype==='doubly' && p.Asp>0){
-    const topBarR = p.barDiaTop ? (p.barDiaTop/2)*sc : barR;
-    const nTopBars = p.barNumTop || Math.max(2, Math.round(p.Asp / (Math.PI*0.9*0.9/4)));
+  if(p.rtype==='doubly' && p.Asp>0 && p.topQty>0){
+    const topR = Math.max(2.2, Math.min(8, p.topDia*sc*0.5));
+    const nTopBars = p.topQty;
     const topBarY  = fy + Math.min(p.dp, p.h-2)*sc;
-    const topSpan  = Math.max(0, ww - 2*(p.cover*sc+stR) - 2*topBarR);
-    const topStep  = nTopBars>1 ? topSpan/(nTopBars-1) : 0;
-    for(let i=0;i<nTopBars;i++){
-      const bx = wx + p.cover*sc + stR + topBarR + (nTopBars===1?topSpan/2:i*topStep);
-      topBars+=`<circle cx="${bx}" cy="${topBarY}" r="${topBarR}" fill="#dc2626" stroke="#7f1d1d" stroke-width="0.6"/>`;
-    }
+    const topSpan  = ww - 2*(p.cover*sc+stR+topR);
+    layoutRow(nTopBars, topSpan).forEach(off=>{
+      topBars+=`<circle cx="${wx+p.cover*sc+stR+topR+off}" cy="${topBarY}" r="${topR}" fill="#dc2626" stroke="#7f1d1d" stroke-width="0.6"/>`;
+    });
   }
 
   // Flange transverse reinforcement indicator (bars perpendicular to beam axis, lie in this section plane)
