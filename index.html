@@ -236,12 +236,38 @@ footer{text-align:center;padding:24px;font-size:11px;color:var(--gray-500)}
   <div class="divider"></div>
   <h3>เหล็กเสริมที่ใช้จริง</h3>
   <div class="field">
-    <label>As ที่จัดวางจริง — เหล็กรับแรงดึงล่าง (Bottom / Tension)</label>
-    <div class="fr"><input type="number" id="As" value="11.40" min="0.1" step="0.1"><span class="unit">cm²</span></div>
+    <label>เหล็กรับแรงดึงล่าง (Bottom / Tension)</label>
+    <div class="fr">
+      <select id="barDia">
+        <option value="1.2">DB12</option>
+        <option value="1.6">DB16</option>
+        <option value="2.0" selected>DB20</option>
+        <option value="2.5">DB25</option>
+        <option value="2.8">DB28</option>
+        <option value="3.2">DB32</option>
+      </select>
+      <span style="font-size:12px;color:var(--gray-500);margin:0 4px">จำนวน</span>
+      <input type="number" id="barNum" value="4" min="1" step="1" style="flex:0.5">
+      <span class="unit">เส้น</span>
+    </div>
+    <div class="hint" style="margin-top:4px">พื้นที่หน้าตัด As = <span id="as-disp" style="font-weight:700;color:var(--blue)">12.57</span> cm²</div>
   </div>
   <div class="field" id="fld-Asp" style="display:none">
-    <label>As′ ที่จัดวางจริง — เหล็กรับแรงอัดบน (Top / Compression) <span class="hint">สำหรับ Doubly</span></label>
-    <div class="fr"><input type="number" id="Asp" value="4.00" min="0" step="0.1"><span class="unit">cm²</span></div>
+    <label>เหล็กรับแรงอัดบน (Top / Compression) <span class="hint">สำหรับ Doubly</span></label>
+    <div class="fr">
+      <select id="barDiaTop">
+        <option value="1.2">DB12</option>
+        <option value="1.6" selected>DB16</option>
+        <option value="2.0">DB20</option>
+        <option value="2.5">DB25</option>
+        <option value="2.8">DB28</option>
+        <option value="3.2">DB32</option>
+      </select>
+      <span style="font-size:12px;color:var(--gray-500);margin:0 4px">จำนวน</span>
+      <input type="number" id="barNumTop" value="2" min="0" step="1" style="flex:0.5">
+      <span class="unit">เส้น</span>
+    </div>
+    <div class="hint" style="margin-top:4px">พื้นที่หน้าตัด As′ = <span id="asp-disp" style="font-weight:700;color:var(--blue)">4.02</span> cm²</div>
   </div>
   <div class="field" id="fld-dp" style="display:none">
     <label>d′ ระยะจากผิวรับแรงอัดถึงศูนย์กลาง As′</label>
@@ -564,10 +590,24 @@ function run(){
   const L   = gv('L'),   s    = gv('s'),   s_e  = gv('s_e');
   const bw  = gv('bw'),  h    = gv('h'),   d    = gv('d'),   hf   = gv('hf');
   const fc  = gv('fc'),  fy   = gv('fy'),  fyt  = gv('fyt');
-  const As  = gv('As'),  sv   = gv('sv'),  cover= gv('cover');
+  
+  const barDia = parseFloat(document.getElementById('barDia').value);
+  const barNum = gi('barNum');
+  const As = (Math.PI * Math.pow(barDia, 2) / 4) * barNum;
+  document.getElementById('as-disp').textContent = As.toFixed(2);
+  
+  const sv   = gv('sv'),  cover= gv('cover');
   const stirDia  = parseFloat(document.getElementById('stirDia').value);
   const stirLegs = parseInt(document.getElementById('stirLegs').value);
-  const Asp = rtype==='doubly' ? gv('Asp') : 0;
+  
+  const barDiaTop = parseFloat(document.getElementById('barDiaTop').value);
+  const barNumTop = gi('barNumTop');
+  let Asp = 0;
+  if(rtype === 'doubly') {
+    Asp = (Math.PI * Math.pow(barDiaTop, 2) / 4) * barNumTop;
+    document.getElementById('asp-disp').textContent = Asp.toFixed(2);
+  }
+  
   const dp  = rtype==='doubly' ? gv('dp')  : 0;
   const flDia = parseFloat(document.getElementById('flDia').value);
   const flSpacing = gv('flSpacing');
@@ -864,7 +904,7 @@ function run(){
   document.getElementById('load-result').innerHTML = lhtml;
 
   /* ── SVG ── */
-  drawSVG({bw,h,hf,bf,d,cover,stirDia,stirLegs,a_mn,As,Asp,dp,rtype});
+  drawSVG({bw,h,hf,bf,d,cover,stirDia,stirLegs,a_mn,As,Asp,dp,rtype, barNum, barNumTop, barDia, barDiaTop});
 
   /* ── SFD / BMD ── */
   drawDiagrams(Lm, Wu_applied_kgf, phiMn, phiVn);
@@ -972,30 +1012,31 @@ function drawSVG(p){
   const azInFlange = Math.min(p.a_mn*sc, fh);
   const azInWeb    = Math.max(0, p.a_mn*sc-fh);
 
-  // bar count estimate from As
-  const barR = Math.max(3, Math.min(7, sc*0.45));
+  // use actual bar count and sizes if provided
+  const barR = p.barDia ? (p.barDia/2)*sc : Math.max(3, Math.min(7, sc*0.45));
   const stR  = Math.max(1.5, sc*p.stirDia*0.4);
-  const nBars = Math.max(2, Math.round(p.As / (Math.PI*(0.9*0.9)/4))); // rough guess for visual
-  const barY  = wb - barR - 2;
-  const barSpan = ww - 2*(p.cover*sc+stR);
+  const nBars = p.barNum || Math.max(2, Math.round(p.As / (Math.PI*(0.9*0.9)/4)));
+  const barY  = wb - p.cover*sc - stR - barR;
+  const barSpan = Math.max(0, ww - 2*(p.cover*sc+stR) - 2*barR);
   const barStep = nBars>1 ? barSpan/(nBars-1) : 0;
 
   let bars='';
   for(let i=0;i<nBars;i++){
-    const bx = wx + p.cover*sc + stR + (nBars===1?barSpan/2:i*barStep);
+    const bx = wx + p.cover*sc + stR + barR + (nBars===1?barSpan/2:i*barStep);
     bars+=`<circle cx="${bx}" cy="${barY}" r="${barR}" fill="#1d4ed8" stroke="#1e3a8a" stroke-width="0.6"/>`;
   }
 
   // Top compression steel (Doubly reinforced)
   let topBars='';
   if(p.rtype==='doubly' && p.Asp>0){
-    const nTopBars = Math.max(2, Math.round(p.Asp / (Math.PI*0.9*0.9/4)));
+    const topBarR = p.barDiaTop ? (p.barDiaTop/2)*sc : barR;
+    const nTopBars = p.barNumTop || Math.max(2, Math.round(p.Asp / (Math.PI*0.9*0.9/4)));
     const topBarY  = fy + Math.min(p.dp, p.h-2)*sc;
-    const topSpan  = ww - 2*(p.cover*sc+stR);
+    const topSpan  = Math.max(0, ww - 2*(p.cover*sc+stR) - 2*topBarR);
     const topStep  = nTopBars>1 ? topSpan/(nTopBars-1) : 0;
     for(let i=0;i<nTopBars;i++){
-      const bx = wx + p.cover*sc + stR + (nTopBars===1?topSpan/2:i*topStep);
-      topBars+=`<circle cx="${bx}" cy="${topBarY}" r="${barR}" fill="#dc2626" stroke="#7f1d1d" stroke-width="0.6"/>`;
+      const bx = wx + p.cover*sc + stR + topBarR + (nTopBars===1?topSpan/2:i*topStep);
+      topBars+=`<circle cx="${bx}" cy="${topBarY}" r="${topBarR}" fill="#dc2626" stroke="#7f1d1d" stroke-width="0.6"/>`;
     }
   }
 
